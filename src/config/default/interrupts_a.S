@@ -52,6 +52,130 @@
 #include <xc.h>
 #include "ISR_Support.h"
 
+   .extern  TIMER_2_Handler
+
+   .section .vector_8,code, keep
+   .equ     __vector_dispatch_8, IntVectorTIMER_2_Handler
+   .global  __vector_dispatch_8
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorTIMER_2_Handler
+
+IntVectorTIMER_2_Handler:
+    la    $26,  _TIMER_2_Handler
+    jr    $26
+    nop
+    .end    IntVectorTIMER_2_Handler
+
+   .section .TIMER_2_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _TIMER_2_Handler
+
+_TIMER_2_Handler:
+    portSAVE_CONTEXT
+    la    s6,  TIMER_2_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _TIMER_2_Handler
+   .extern  TIMER_3_Handler
+
+   .section .vector_12,code, keep
+   .equ     __vector_dispatch_12, IntVectorTIMER_3_Handler
+   .global  __vector_dispatch_12
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorTIMER_3_Handler
+
+IntVectorTIMER_3_Handler:
+    la    $26,  _TIMER_3_Handler
+    jr    $26
+    nop
+    .end    IntVectorTIMER_3_Handler
+
+   .section .TIMER_3_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _TIMER_3_Handler
+
+_TIMER_3_Handler:
+    portSAVE_CONTEXT
+    la    s6,  TIMER_3_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _TIMER_3_Handler
+   .extern  TIMER_4_Handler
+
+   .section .vector_16,code, keep
+   .equ     __vector_dispatch_16, IntVectorTIMER_4_Handler
+   .global  __vector_dispatch_16
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorTIMER_4_Handler
+
+IntVectorTIMER_4_Handler:
+    la    $26,  _TIMER_4_Handler
+    jr    $26
+    nop
+    .end    IntVectorTIMER_4_Handler
+
+   .section .TIMER_4_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _TIMER_4_Handler
+
+_TIMER_4_Handler:
+    portSAVE_CONTEXT
+    la    s6,  TIMER_4_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _TIMER_4_Handler
+   .extern  TIMER_5_Handler
+
+   .section .vector_20,code, keep
+   .equ     __vector_dispatch_20, IntVectorTIMER_5_Handler
+   .global  __vector_dispatch_20
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorTIMER_5_Handler
+
+IntVectorTIMER_5_Handler:
+    la    $26,  _TIMER_5_Handler
+    jr    $26
+    nop
+    .end    IntVectorTIMER_5_Handler
+
+   .section .TIMER_5_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _TIMER_5_Handler
+
+_TIMER_5_Handler:
+    portSAVE_CONTEXT
+    la    s6,  TIMER_5_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _TIMER_5_Handler
    .extern  I2C_1_Handler
 
    .section .vector_33,code, keep

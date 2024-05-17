@@ -1,25 +1,26 @@
 /*******************************************************************************
-  TMR1 Peripheral Library Interface Source File
+  DMA System Service Library Implementation Source File
 
   Company
     Microchip Technology Inc.
 
   File Name
-    plib_tmr1.c
+    sys_dma.c
 
   Summary
-    TMR1 peripheral library source file.
+    DMA system service library interface implementation.
 
   Description
-    This file implements the interface to the TMR1 peripheral library.  This
-    library provides access to and control of the associated peripheral
-    instance.
+    This file implements the interface to the DMA system service library.
+
+  Remarks:
+    DMA controller initialize will be done from within the MCC.
 
 *******************************************************************************/
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -42,106 +43,55 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
-#include "device.h"
-#include "plib_tmr1.h"
-#include "interrupts.h"
+#include "system/dma/sys_dma.h"
 
-volatile static TMR1_TIMER_OBJECT tmr1Obj;
 
-void TMR1_Initialize(void)
+//******************************************************************************
+/* Function:
+    void SYS_DMA_AddressingModeSetup(SYS_DMA_CHANNEL channel, SYS_DMA_SOURCE_ADDRESSING_MODE sourceAddrMode, SYS_DMA_DESTINATION_ADDRESSING_MODE destAddrMode);
+
+  Summary:
+    Setup addressing mode of selected DMA channel.
+
+  Remarks:
+    Check sys_dma.h for more info.
+*/
+void SYS_DMA_AddressingModeSetup(SYS_DMA_CHANNEL channel, SYS_DMA_SOURCE_ADDRESSING_MODE sourceAddrMode, SYS_DMA_DESTINATION_ADDRESSING_MODE destAddrMode)
 {
-    /* Disable Timer */
-    T1CONCLR = _T1CON_ON_MASK;
-
-    /*
-    SIDL = 0
-    TWDIS = 1
-    TGATE = 0
-    TCKPS = 0
-    TSYNC = 0
-    TCS = 0
-    */
-    T1CONSET = 0x1000;
-
-    /* Clear counter */
-    TMR1 = 0x0;
-
-    /*Set period */
-    PR1 = 1279;
-
-    /* Setup TMR1 Interrupt */
-    TMR1_InterruptEnable();  /* Enable interrupt on the way out */
 }
 
+//******************************************************************************
+/* Function:
+    void SYS_DMA_DataWidthSetup(SYS_DMA_CHANNEL channel, SYS_DMA_WIDTH dataWidth);
 
-void TMR1_Start (void)
+  Summary:
+    Setup data width of selected DMA channel.
+
+  Remarks:
+    Check sys_dma.h for more info.
+*/
+void SYS_DMA_DataWidthSetup(SYS_DMA_CHANNEL channel, SYS_DMA_WIDTH dataWidth)
 {
-    T1CONSET = _T1CON_ON_MASK;
 }
 
+//******************************************************************************
+/* Function:
+   void SYS_DMA_ChannelTransfer(channel, srcAddr, destAddr, blockSize);
 
-void TMR1_Stop (void)
+  Summary:
+    Setup data width of selected DMA channel.
+
+  Remarks:
+    Check sys_dma.h for more info.
+*/
+bool SYS_DMA_ChannelTransfer (SYS_DMA_CHANNEL channel, const void *srcAddr, const void *destAddr, size_t blockSize)
 {
-    T1CONCLR = _T1CON_ON_MASK;
-}
-
-
-void TMR1_PeriodSet(uint16_t period)
-{
-    PR1 = period;
-}
-
-
-uint16_t TMR1_PeriodGet(void)
-{
-    return (uint16_t)PR1;
-}
-
-
-uint16_t TMR1_CounterGet(void)
-{
-    return((uint16_t)TMR1);
-}
-
-uint32_t TMR1_FrequencyGet(void)
-{
-    return (40000000);
-}
-
-void __attribute__((used)) TIMER_1_InterruptHandler (void)
-{
-    uint32_t status = IFS0bits.T1IF;
-    IFS0CLR = _IFS0_T1IF_MASK;
-
-    if((tmr1Obj.callback_fn != NULL))
-    {
-        uintptr_t context = tmr1Obj.context;
-        tmr1Obj.callback_fn(status, context);
-    }
-}
-
-
-void TMR1_InterruptEnable(void)
-{
-    IEC0SET = _IEC0_T1IE_MASK;
-}
-
-
-void TMR1_InterruptDisable(void)
-{
-    IEC0CLR = _IEC0_T1IE_MASK;
-}
-
-
-void TMR1_CallbackRegister( TMR1_CALLBACK callback_fn, uintptr_t context )
-{
-    /* - Save callback_fn and context in local memory */
-    tmr1Obj.callback_fn = callback_fn;
-    tmr1Obj.context = context;
+    return true;
 }

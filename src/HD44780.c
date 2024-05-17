@@ -25,7 +25,8 @@ const static TickType_t delay50ms = (50 / portTICK_PERIOD_MS);
 const static TickType_t delay5ms = (10 / portTICK_PERIOD_MS);
 
 struct HD44780Config {
-    uint8_t Rows;
+    uint8_t Lines;
+    bool IsInterlaced;
     uint8_t Cols;
     uint8_t Flags;
 };
@@ -71,7 +72,6 @@ bool LocalHD44780SendCommand(struct HD44780Instance* instance, uint8_t cmd) {
         i2c_cmd_bytes,
         4
     );
-    //return DRV_I2C_WriteTransfer(sysObj.i2cHandle, 0x27, i2c_bytes, 4);
 }
 
 bool LocalHD44780SendData(struct HD44780Instance* instance, const char* data) {
@@ -100,6 +100,29 @@ bool LocalHD44780SendData(struct HD44780Instance* instance, const char* data) {
     }
     
     return true;
+}
+
+bool HD44780GoTo(struct HD44780Instance* instance, uint8_t line, uint8_t col) {
+    if(line > instance->Config.Lines)
+        return false;
+    if(col > instance->Config.Cols)
+        return false;
+    
+    uint8_t location = 0;
+    
+    if(line == 1)
+        location = 0x40;
+    else if(line == 2)
+        location = 0x14;
+    else if(line == 3)
+        location = 0x54;
+            
+    location += col;
+    
+    bool result = LocalHD44780SendCommand(instance, HD44780_CMD_SET_DD | location);
+    vTaskDelay(timer1);
+    
+    return result;
 }
 
 bool HD44780Initialize(struct HD44780Instance* instance) {
@@ -149,8 +172,10 @@ bool HD44780Initialize(struct HD44780Instance* instance) {
     return true;
 }
 
-void HD44780SetConfig(struct HD44780Instance* instance) {
-    
+void HD44780SetSize(struct HD44780Instance* instance, uint8_t lines, uint8_t cols, bool isInterlaced) {
+    instance->Config.Lines = lines;
+    instance->Config.Cols = cols;
+    instance->Config.IsInterlaced = isInterlaced;
 }
 
 bool HD44780PrintString(struct HD44780Instance* instance, const char* string) {

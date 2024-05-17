@@ -66,6 +66,8 @@ struct HD44780Config;
 #define HD44780_CMD_DISPLAY         0x08
 #define HD44780_CMD_SHIFT           0x10
 #define HD44780_CMD_FUNCTION        0x20
+#define HD44780_CMD_SET_CG          0x40
+#define HD44780_CMD_SET_DD          0x80
 
 #define HD44780_FLAG_RS             0x01
 #define HD44780_FLAG_R_NW           0x02
@@ -94,11 +96,12 @@ struct HD44780Instance;
 
 struct HD44780Instance* HD44780AllocInstance(uint8_t displayId, void* sendContext, HD44780SendData func);
 bool HD44780Initialize(struct HD44780Instance* instance);
-void HD44780SetConfig(struct HD44780Instance* instance);
+void HD44780SetSize(struct HD44780Instance* instance, uint8_t lines, uint8_t cols, bool isInterlaced);
 
 bool HD44780PrintString(struct HD44780Instance* instance, const char* string);
 bool HD44780ClearScreen(struct HD44780Instance* instance);
 bool HD44780Home(struct HD44780Instance* instance);
+bool HD44780GoTo(struct HD44780Instance* instance, uint8_t line, uint8_t col);
 
 #ifdef __cplusplus
 }

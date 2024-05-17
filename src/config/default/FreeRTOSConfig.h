@@ -50,7 +50,7 @@
 #define configMINIMAL_STACK_SIZE                ( 128 )
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configSUPPORT_STATIC_ALLOCATION         0
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) 28000 )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) 22000 )
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -110,7 +110,7 @@
 #define INCLUDE_vTaskDelay                      1
 #define INCLUDE_xTaskGetSchedulerState          0
 #define INCLUDE_xTaskGetCurrentTaskHandle       1
-#define INCLUDE_uxTaskGetStackHighWaterMark     0
+#define INCLUDE_uxTaskGetStackHighWaterMark     1
 #define INCLUDE_xTaskGetIdleTaskHandle          0
 #define INCLUDE_eTaskGetState                   0
 #define INCLUDE_xTimerPendFunctionCall          0
@@ -119,7 +119,7 @@
 #define INCLUDE_xQueueGetMutexHolder            0
 #define INCLUDE_xSemaphoreGetMutexHolder        0
 #define INCLUDE_uxTaskGetStackHighWaterMark2    0
-#define INCLUDE_xTaskResumeFromISR              0
+#define INCLUDE_xTaskResumeFromISR              1
 
 
 /* MISRAC 2012 deviation block end */

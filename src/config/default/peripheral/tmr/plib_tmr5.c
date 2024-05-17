@@ -1,17 +1,17 @@
 /*******************************************************************************
-  TMR1 Peripheral Library Interface Source File
+  TMR Peripheral Library Interface Source File
 
   Company
     Microchip Technology Inc.
 
   File Name
-    plib_tmr1.c
+    plib_tmr5.c
 
   Summary
-    TMR1 peripheral library source file.
+    TMR5 peripheral library source file.
 
   Description
-    This file implements the interface to the TMR1 peripheral library.  This
+    This file implements the interface to the TMR peripheral library.  This
     library provides access to and control of the associated peripheral
     instance.
 
@@ -42,6 +42,7 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
@@ -49,99 +50,100 @@
 // *****************************************************************************
 
 #include "device.h"
-#include "plib_tmr1.h"
+#include "plib_tmr5.h"
 #include "interrupts.h"
 
-volatile static TMR1_TIMER_OBJECT tmr1Obj;
 
-void TMR1_Initialize(void)
+volatile static TMR_TIMER_OBJECT tmr5Obj;
+
+
+void TMR5_Initialize(void)
 {
     /* Disable Timer */
-    T1CONCLR = _T1CON_ON_MASK;
+    T5CONCLR = _T5CON_ON_MASK;
 
     /*
     SIDL = 0
-    TWDIS = 1
-    TGATE = 0
-    TCKPS = 0
-    TSYNC = 0
+    TCKPS =0
+    T32   = 0
     TCS = 0
     */
-    T1CONSET = 0x1000;
+    T5CONSET = 0x0;
 
     /* Clear counter */
-    TMR1 = 0x0;
+    TMR5 = 0x0;
 
     /*Set period */
-    PR1 = 1279;
+    PR5 = 1279U;
 
-    /* Setup TMR1 Interrupt */
-    TMR1_InterruptEnable();  /* Enable interrupt on the way out */
+    /* Enable TMR Interrupt */
+    IEC0SET = _IEC0_T5IE_MASK;
+
 }
 
 
-void TMR1_Start (void)
+void TMR5_Start(void)
 {
-    T1CONSET = _T1CON_ON_MASK;
+    T5CONSET = _T5CON_ON_MASK;
 }
 
 
-void TMR1_Stop (void)
+void TMR5_Stop (void)
 {
-    T1CONCLR = _T1CON_ON_MASK;
+    T5CONCLR = _T5CON_ON_MASK;
 }
 
-
-void TMR1_PeriodSet(uint16_t period)
+void TMR5_PeriodSet(uint16_t period)
 {
-    PR1 = period;
+    PR5  = period;
 }
 
-
-uint16_t TMR1_PeriodGet(void)
+uint16_t TMR5_PeriodGet(void)
 {
-    return (uint16_t)PR1;
+    return (uint16_t)PR5;
 }
 
-
-uint16_t TMR1_CounterGet(void)
+uint16_t TMR5_CounterGet(void)
 {
-    return((uint16_t)TMR1);
+    return (uint16_t)(TMR5);
 }
 
-uint32_t TMR1_FrequencyGet(void)
+
+uint32_t TMR5_FrequencyGet(void)
 {
     return (40000000);
 }
 
-void __attribute__((used)) TIMER_1_InterruptHandler (void)
-{
-    uint32_t status = IFS0bits.T1IF;
-    IFS0CLR = _IFS0_T1IF_MASK;
 
-    if((tmr1Obj.callback_fn != NULL))
+void __attribute__((used)) TIMER_5_InterruptHandler (void)
+{
+    uint32_t status  = 0U;
+    status = IFS0bits.T5IF;
+    IFS0CLR = _IFS0_T5IF_MASK;
+
+    if((tmr5Obj.callback_fn != NULL))
     {
-        uintptr_t context = tmr1Obj.context;
-        tmr1Obj.callback_fn(status, context);
+        uintptr_t context = tmr5Obj.context;
+        tmr5Obj.callback_fn(status, context);
     }
 }
 
 
-void TMR1_InterruptEnable(void)
+void TMR5_InterruptEnable(void)
 {
-    IEC0SET = _IEC0_T1IE_MASK;
+    IEC0SET = _IEC0_T5IE_MASK;
 }
 
 
-void TMR1_InterruptDisable(void)
+void TMR5_InterruptDisable(void)
 {
-    IEC0CLR = _IEC0_T1IE_MASK;
+    IEC0CLR = _IEC0_T5IE_MASK;
 }
 
 
-void TMR1_CallbackRegister( TMR1_CALLBACK callback_fn, uintptr_t context )
+void TMR5_CallbackRegister( TMR_CALLBACK callback_fn, uintptr_t context )
 {
-    /* - Save callback_fn and context in local memory */
-    tmr1Obj.callback_fn = callback_fn;
-    tmr1Obj.context = context;
+    /* Save callback_fn and context in local memory */
+    tmr5Obj.callback_fn = callback_fn;
+    tmr5Obj.context = context;
 }

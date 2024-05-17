@@ -61,23 +61,29 @@
 // *****************************************************************************
 // *****************************************************************************
 /* Handle for the APP_Tasks. */
-TaskHandle_t xAPP_Tasks;
+TaskHandle_t xAPP_Task;
+TaskHandle_t xI2C_Task;
+TaskHandle_t xREAD_MIDI_Task;
 
-static void lAPP_Tasks(  void *pvParameters  )
+static void lAPP_Task(  void *pvParameters  )
 {   
     while(true)
     {
-        APP_Tasks();
+        APP_Task();
     }
 }
 
-TaskHandle_t xI2C_Task;
 static void lAPP_I2C_Task(void *pvParam) {
     while(true) {
         APP_I2C_Task();
     }
 }
 
+static void lAPP_READ_MIDI_Task(void *pvParam) {
+    while(true) {
+        APP_READ_MIDI_Task();
+    }
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -105,12 +111,12 @@ void SYS_Tasks ( void )
 
     /* Maintain the application's state machine. */
         /* Create OS Thread for APP_Tasks. */
-    (void) xTaskCreate((TaskFunction_t) lAPP_Tasks,
-                "APP_Tasks",
-                128,
+    (void) xTaskCreate((TaskFunction_t) lAPP_Task,
+                "APP_Task",
+                1024,
                 NULL,
                 1,
-                &xAPP_Tasks);
+                &xAPP_Task);
 
     (void) xTaskCreate((TaskFunction_t) lAPP_I2C_Task,
             "I2C_Task",
@@ -119,6 +125,12 @@ void SYS_Tasks ( void )
             1,
             &xI2C_Task);
 
+    (void) xTaskCreate((TaskFunction_t) lAPP_READ_MIDI_Task,
+            "MIDI_IN_TASK",
+            512,
+            NULL,
+            5,
+            &xREAD_MIDI_Task);
 
     /* Start RTOS Scheduler. */
     

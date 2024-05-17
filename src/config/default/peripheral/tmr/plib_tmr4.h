@@ -1,22 +1,25 @@
 /*******************************************************************************
- System Interrupts File
+  Data Type definition of Timer PLIB
 
   Company:
     Microchip Technology Inc.
 
   File Name:
-    interrupt.h
+    plib_tmr4.h
 
   Summary:
-    Interrupt vectors mapping
+    Data Type definition of the Timer Peripheral Interface Plib.
 
   Description:
-    This file contains declarations of device vectors used by Harmony 3
- *******************************************************************************/
+    This file defines the Data Types for the Timer Plib.
 
-// DOM-IGNORE-BEGIN
+  Remarks:
+    None.
+
+*******************************************************************************/
+
 /*******************************************************************************
-* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -36,33 +39,65 @@
 * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *******************************************************************************/
+*******************************************************************************/
+
+#ifndef PLIB_TMR4_H
+#define PLIB_TMR4_H
+
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "device.h"
+#include "plib_tmr_common.h"
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
+#endif
 // DOM-IGNORE-END
 
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
-
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files
-// *****************************************************************************
-// *****************************************************************************
-#include <stdint.h>
-
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Handler Routines
+// Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
 
-void TIMER_2_InterruptHandler( void );
-void TIMER_3_InterruptHandler( void );
-void TIMER_4_InterruptHandler( void );
-void TIMER_5_InterruptHandler( void );
-void I2C_1_InterruptHandler( void );
+// *****************************************************************************
+// *****************************************************************************
+// Section: Interface Routines
+// *****************************************************************************
+// *****************************************************************************
 
 
+// *****************************************************************************
+void TMR4_Initialize(void);
 
-#endif // INTERRUPTS_H
+void TMR4_Start(void);
+
+void TMR4_Stop(void);
+
+void TMR4_PeriodSet(uint16_t period);
+
+uint16_t TMR4_PeriodGet(void);
+
+uint16_t TMR4_CounterGet(void);
+
+uint32_t TMR4_FrequencyGet(void);
+
+void TMR4_InterruptEnable(void);
+
+void TMR4_InterruptDisable(void);
+
+void TMR4_CallbackRegister( TMR_CALLBACK callback_fn, uintptr_t context );
+
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    }
+#endif
+// DOM-IGNORE-END
+
+#endif /* PLIB_TMR4_H */

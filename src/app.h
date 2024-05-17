@@ -74,6 +74,13 @@ typedef enum {
     DISPLAY_STATE_READY,
 } DISPLAY_STATE;
 
+typedef enum {
+    READ_MIDI_STATE_INIT = 0,
+    READ_MIDI_STATE_INIT_ERR,
+    READ_MIDI_STATE_READY,
+    READ_MIDI_STATE_READING,
+} READ_MIDI_STATE;
+
 // *****************************************************************************
 /* Application Data
 
@@ -94,11 +101,23 @@ typedef struct {
     
     DISPLAY_STATE display1State;
     struct HD44780Instance *lcd;
-
+    char displayMessageBuffer[21];
+    
     DRV_HANDLE i2cHandle;
     DRV_I2C_ERROR i2cErr;
+    uint32_t lastReadStackSize;
+           
+    READ_MIDI_STATE readMidi1State;
+    
+    uint32_t largestTaskStackSize;
+    char *taskName;
 
+    uint16_t tmr2Ticks;
 } APP_DATA;
+
+extern TaskHandle_t xAPP_Task;
+extern TaskHandle_t xI2C_Task;
+extern TaskHandle_t xREAD_MIDI_Task;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -178,12 +197,15 @@ void APP_Initialize ( void );
     This routine must be called from SYS_Tasks() routine.
  */
 
-void APP_Tasks( void );
+void APP_READ_MIDI_Task(void);
+
+void APP_Task( void );
 
 void APP_I2C_Task(void);
 
-#define appSTRINGS_DISPLAY_READY "Display ready"
-#define appSTRINGS_APP_INITIALIZING "App initializing.."
+#define appSTRINGS_BLANK_LINE           "                    "
+#define appSTRINGS_DISPLAY_READY        "Display ready"
+#define appSTRINGS_APP_INITIALIZING     "App initializing.."
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

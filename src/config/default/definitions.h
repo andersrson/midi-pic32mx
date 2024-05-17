@@ -49,6 +49,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "peripheral/i2c/master/plib_i2c1_master.h"
+#include "peripheral/tmr/plib_tmr4.h"
+#include "peripheral/tmr/plib_tmr5.h"
+#include "peripheral/tmr/plib_tmr2.h"
+#include "peripheral/tmr/plib_tmr3.h"
 #include "peripheral/clk/plib_clk.h"
 #include "peripheral/gpio/plib_gpio.h"
 #include "peripheral/evic/plib_evic.h"
@@ -57,6 +61,7 @@
 #include "task.h"
 #include "driver/i2c/drv_i2c.h"
 #include "system/int/sys_int.h"
+#include "system/dma/sys_dma.h"
 #include "osal/osal.h"
 #include "system/debug/sys_debug.h"
 #include "app.h"
@@ -194,6 +199,7 @@ typedef struct
     SYS_MODULE_OBJ drvI2C0;
     DRV_HANDLE i2cHandle;
 
+
 } SYSTEM_OBJECTS;
 
 // *****************************************************************************
@@ -209,6 +215,9 @@ extern SYSTEM_OBJECTS sysObj;
 extern TickType_t timer500;
 extern TickType_t timer100;
 extern TickType_t timer50;
+extern TickType_t timer10;
+extern TickType_t timer5;
+extern TickType_t timer1;
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

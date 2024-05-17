@@ -36,6 +36,13 @@
                 <itemPath>../src/config/default/peripheral/i2c/master/plib_i2c1_master.h</itemPath>
               </logicalFolder>
             </logicalFolder>
+            <logicalFolder name="tmr" displayName="tmr" projectFiles="true">
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr3.h</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr5.h</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr_common.h</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr4.h</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr2.h</itemPath>
+            </logicalFolder>
             <logicalFolder name="tmr1" displayName="tmr1" projectFiles="true">
               <itemPath>../src/config/default/peripheral/tmr1/plib_tmr1_common.h</itemPath>
               <itemPath>../src/config/default/peripheral/tmr1/plib_tmr1.h</itemPath>
@@ -44,6 +51,10 @@
           <logicalFolder name="system" displayName="system" projectFiles="true">
             <logicalFolder name="debug" displayName="debug" projectFiles="true">
               <itemPath>../src/config/default/system/debug/sys_debug.h</itemPath>
+            </logicalFolder>
+            <logicalFolder name="dma" displayName="dma" projectFiles="true">
+              <itemPath>../src/config/default/system/dma/sys_dma.h</itemPath>
+              <itemPath>../src/config/default/system/dma/sys_dma_mapping.h</itemPath>
             </logicalFolder>
             <logicalFolder name="int" displayName="int" projectFiles="true">
               <itemPath>../src/config/default/system/int/sys_int.h</itemPath>
@@ -96,6 +107,7 @@
       <itemPath>../src/app.h</itemPath>
       <itemPath>i2c_pcf8574_display.h</itemPath>
       <itemPath>../src/HD44780.h</itemPath>
+      <itemPath>../src/midi.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -140,6 +152,12 @@
                 <itemPath>../src/config/default/peripheral/i2c/master/plib_i2c1_master.c</itemPath>
               </logicalFolder>
             </logicalFolder>
+            <logicalFolder name="tmr" displayName="tmr" projectFiles="true">
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr3.c</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr5.c</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr2.c</itemPath>
+              <itemPath>../src/config/default/peripheral/tmr/plib_tmr4.c</itemPath>
+            </logicalFolder>
             <logicalFolder name="tmr1" displayName="tmr1" projectFiles="true">
               <itemPath>../src/config/default/peripheral/tmr1/plib_tmr1.c</itemPath>
             </logicalFolder>
@@ -148,6 +166,9 @@
             <itemPath>../src/config/default/stdio/xc32_monitor.c</itemPath>
           </logicalFolder>
           <logicalFolder name="system" displayName="system" projectFiles="true">
+            <logicalFolder name="dma" displayName="dma" projectFiles="true">
+              <itemPath>../src/config/default/system/dma/sys_dma.c</itemPath>
+            </logicalFolder>
             <logicalFolder name="int" displayName="int" projectFiles="true">
               <itemPath>../src/config/default/system/int/src/sys_int.c</itemPath>
             </logicalFolder>
@@ -185,6 +206,7 @@
       <itemPath>../src/main.c</itemPath>
       <itemPath>../src/app.c</itemPath>
       <itemPath>../src/HD44780.c</itemPath>
+      <itemPath>../src/midi.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -217,7 +239,7 @@
         </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
+          <parseOnProdLoad>true</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
         <subordinates>
@@ -236,6 +258,7 @@
       <C32>
         <property key="additional-warnings" value="true"/>
         <property key="addresss-attribute-use" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="enable-app-io" value="false"/>
         <property key="enable-omit-frame-pointer" value="false"/>
         <property key="enable-symbols" value="true"/>
@@ -265,6 +288,7 @@
         <property key="additional-options-chop-files" value="false"/>
       </C32-AR>
       <C32-AS>
+        <property key="appendMe" value=""/>
         <property key="assembler-symbols" value=""/>
         <property key="enable-symbols" value="true"/>
         <property key="exclude-floating-point-library" value="false"/>
@@ -294,6 +318,7 @@
         <property key="additional-options-use-response-files" value="false"/>
         <property key="additional-options-write-sla" value="false"/>
         <property key="allocate-dinit" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="code-dinit" value="false"/>
         <property key="ebase-addr" value=""/>
         <property key="enable-check-sections" value="false"/>
@@ -333,6 +358,7 @@
       <C32CPP>
         <property key="additional-warnings" value="false"/>
         <property key="addresss-attribute-use" value="false"/>
+        <property key="appendMe" value=""/>
         <property key="check-new" value="false"/>
         <property key="eh-specs" value="true"/>
         <property key="enable-app-io" value="false"/>
@@ -538,6 +564,8 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d01ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="/Users/anders/Documents/MPLABXProjects/MIDI1/MIDI1.X/debug/default/MIDI1_ptg"/>
         <property key="programmerToGoImageName" value="MIDI1_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

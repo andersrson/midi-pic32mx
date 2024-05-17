@@ -68,7 +68,7 @@
 #pragma config FPBDIV =     DIV_1
 #pragma config FSOSCEN =    OFF
 #pragma config IESO =       OFF
-#pragma config POSCMOD =    OFF
+#pragma config POSCMOD =    XT
 #pragma config OSCIOFNC =   OFF
 #pragma config FCKSM =      CSDCMD
 #pragma config WDTPS =      PS1048576
@@ -79,9 +79,9 @@
 
 /*** DEVCFG2 ***/
 #pragma config FPLLIDIV =   DIV_2
-#pragma config FPLLMUL =    MUL_24
+#pragma config FPLLMUL =    MUL_20
 #pragma config FPLLODIV =   DIV_2
-#pragma config UPLLEN =     OFF
+#pragma config UPLLEN =     ON
 #pragma config UPLLIDIV =   DIV_2
 
 /*** DEVCFG3 ***/
@@ -163,9 +163,14 @@ static const DRV_I2C_INIT drvI2C0InitData =
 // *****************************************************************************
 /* Structure to hold the object handles for the modules in the system. */
 SYSTEM_OBJECTS sysObj;
+
 TickType_t timer500 = (500 / portTICK_PERIOD_MS);
 TickType_t timer100 = (100 / portTICK_PERIOD_MS);
 TickType_t timer50 = (50 / portTICK_PERIOD_MS);
+TickType_t timer10 = (10 / portTICK_PERIOD_MS);
+TickType_t timer5 = (5 / portTICK_PERIOD_MS);
+TickType_t timer1 = (1 / portTICK_PERIOD_MS);
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Library/Stack Initialization Data
@@ -219,7 +224,14 @@ void SYS_Initialize ( void* data ) {
     GPIO_Initialize();
 
     I2C1_Initialize();
-    
+    TMR4_Initialize();
+
+    TMR5_Initialize();
+
+    TMR2_Initialize();
+
+    TMR3_Initialize();
+
     TMR1_Initialize();
     
     /* MISRAC 2012 deviation block start */
@@ -230,7 +242,10 @@ void SYS_Initialize ( void* data ) {
     /* Initialize I2C0 Driver Instance */
     sysObj.drvI2C0 = DRV_I2C_Initialize(DRV_I2C_INDEX_0, (SYS_MODULE_INIT *)&drvI2C0InitData);
 
+
     sysObj.i2cHandle = DRV_HANDLE_INVALID;
+
+
     /* MISRAC 2012 deviation block end */
     APP_Initialize();
 

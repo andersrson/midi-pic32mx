@@ -51,6 +51,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+private/
+
 .DS_Store
 **/.generated_files/
 

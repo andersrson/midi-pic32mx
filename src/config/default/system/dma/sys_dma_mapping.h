@@ -1,21 +1,23 @@
 /*******************************************************************************
- System Interrupts File
+  DMA System Service Mapping File
 
   Company:
     Microchip Technology Inc.
 
   File Name:
-    interrupt.h
+    sys_dma_mapping.h
 
   Summary:
-    Interrupt vectors mapping
+    DMA System Service mapping file.
 
   Description:
-    This file contains declarations of device vectors used by Harmony 3
- *******************************************************************************/
+    This header file contains the mapping of the APIs defined in the API header
+    to either the function implementations or macro implementation or the
+    specific variant implementation.
+*******************************************************************************/
 
-// DOM-IGNORE-BEGIN
-/*******************************************************************************
+//DOM-IGNORE-BEGIN
+/******************************************************************************
 * Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
@@ -36,33 +38,23 @@
 * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *******************************************************************************/
-// DOM-IGNORE-END
+*******************************************************************************/
+//DOM-IGNORE-END
 
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Included Files
-// *****************************************************************************
-// *****************************************************************************
-#include <stdint.h>
-
+#ifndef SYS_DMA_MAPPING_H
+#define SYS_DMA_MAPPING_H
 
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Handler Routines
+// Section: DMA System Service Mapping
 // *****************************************************************************
 // *****************************************************************************
 
-void TIMER_2_InterruptHandler( void );
-void TIMER_3_InterruptHandler( void );
-void TIMER_4_InterruptHandler( void );
-void TIMER_5_InterruptHandler( void );
-void I2C_1_InterruptHandler( void );
+#define SYS_DMA_ChannelCallbackRegister(channel, eventHandler, context)
 
+#define SYS_DMA_ChannelIsBusy(channel)
 
+#define SYS_DMA_ChannelDisable(channel)
 
-#endif // INTERRUPTS_H
+#endif // SYS_DMA_MAPPING_H

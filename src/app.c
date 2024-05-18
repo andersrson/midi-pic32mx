@@ -124,7 +124,7 @@ uint8_t readBits; // How many bits have been read
 uint8_t readByte; // temp storage byte currently being deserialized
 uint8_t currentByteIndex; // where will next deserialized byte be saved
 uint8_t midiBytes[4] = { 0, 0, 0, 0 }; // array of deserialized bytes
-uint8_t consecutiveOnes = 0; // counter to reset currentByteIndex
+uint8_t consecutiveIdleTicks = 0; // counter to reset currentByteIndex
 
 void tmrInputRead(uint32_t status, uintptr_t context) {
     GPIO_RA1_Toggle();
@@ -132,23 +132,10 @@ void tmrInputRead(uint32_t status, uintptr_t context) {
     
     switch(midiPort1State) {
         case IDLE: {
-            if(midiPortIn == 0) {
-                midiPort1State = DATA_BIT;
-                readBits = 0;
-                readByte = 0;
-                
-            } else {
-                // Reset after a few idle cycles, before we have actual interpretation of MIDI messages
-                if(midiPortIn == 1)
-                    consecutiveOnes++;
-                
-                if(consecutiveOnes > 5) {
-                    currentByteIndex = 0;
-                }
-            }
+            // Should never happen
             break;
         } case START_BIT: {
-            midiPort1State = DATA_BIT;
+            // Should never happen
             break;
         } case DATA_BIT: {
             GPIO_RA0_Set();
@@ -171,10 +158,11 @@ void tmrInputRead(uint32_t status, uintptr_t context) {
             
             midiBytes[currentByteIndex++] = readByte;
             midiPort1State = IDLE;
-            consecutiveOnes = 0;
+            consecutiveIdleTicks = 0;
             
             TMR2_Stop();
             GPIO_RB5_InterruptEnable();
+            
             break;
         }
     }
@@ -194,13 +182,13 @@ void pinChangeNotification(GPIO_PIN pin, uintptr_t context) {
 void tmrInputInitialize(uint32_t status, uintptr_t context) {
     
     if(GPIO_RB5_Get() == 1) {
-        consecutiveOnes++;
+        consecutiveIdleTicks++;
     } else {
-        consecutiveOnes = 0;
+        consecutiveIdleTicks = 0;
         return;
     }
     
-    if(consecutiveOnes > 3) {
+    if(consecutiveIdleTicks > 3) {
         TMR2_Stop();
         TMR2_CallbackRegister(&tmrInputRead, 0);
         GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB5, &pinChangeNotification, 0);
@@ -213,7 +201,7 @@ void APP_READ_MIDI_Task(void) {
         case READ_MIDI_STATE_INIT: {
             midiPort1State = IDLE;
             
-            consecutiveOnes = 0;
+            consecutiveIdleTicks = 0;
             TMR2_CallbackRegister(&tmrInputInitialize, 0);
             TMR2_Start();
             

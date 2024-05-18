@@ -62,6 +62,7 @@ void TIMER_3_InterruptHandler( void );
 void TIMER_4_InterruptHandler( void );
 void TIMER_5_InterruptHandler( void );
 void I2C_1_InterruptHandler( void );
+void CHANGE_NOTICE_InterruptHandler( void );
 
 
 

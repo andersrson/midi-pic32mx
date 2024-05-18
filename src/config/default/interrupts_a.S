@@ -207,4 +207,35 @@ _I2C_1_Handler:
     nop
     portRESTORE_CONTEXT
     .end    _I2C_1_Handler
+   .extern  CHANGE_NOTICE_Handler
+
+   .section .vector_34,code, keep
+   .equ     __vector_dispatch_34, IntVectorCHANGE_NOTICE_Handler
+   .global  __vector_dispatch_34
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorCHANGE_NOTICE_Handler
+
+IntVectorCHANGE_NOTICE_Handler:
+    la    $26,  _CHANGE_NOTICE_Handler
+    jr    $26
+    nop
+    .end    IntVectorCHANGE_NOTICE_Handler
+
+   .section .CHANGE_NOTICE_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _CHANGE_NOTICE_Handler
+
+_CHANGE_NOTICE_Handler:
+    portSAVE_CONTEXT
+    la    s6,  CHANGE_NOTICE_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _CHANGE_NOTICE_Handler
 

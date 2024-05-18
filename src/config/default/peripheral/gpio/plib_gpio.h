@@ -142,6 +142,8 @@
 #define GPIO_RB5_InputEnable()       (TRISBSET = (1<<5))
 #define GPIO_RB5_Get()               ((PORTB >> 5) & 0x1)
 #define GPIO_RB5_PIN                  GPIO_PIN_RB5
+#define GPIO_RB5_InterruptEnable()   (CNENBSET = (1<<5))
+#define GPIO_RB5_InterruptDisable()  (CNENBCLR = (1<<5))
 
 /*** Macros for GPIO_RB7 pin ***/
 #define GPIO_RB7_Set()               (LATBSET = (1<<7))
@@ -151,6 +153,8 @@
 #define GPIO_RB7_InputEnable()       (TRISBSET = (1<<7))
 #define GPIO_RB7_Get()               ((PORTB >> 7) & 0x1)
 #define GPIO_RB7_PIN                  GPIO_PIN_RB7
+#define GPIO_RB7_InterruptEnable()   (CNENBSET = (1<<7))
+#define GPIO_RB7_InterruptDisable()  (CNENBCLR = (1<<7))
 
 /*** Macros for GPIO_RB10 pin ***/
 #define GPIO_RB10_Set()               (LATBSET = (1<<10))
@@ -160,6 +164,8 @@
 #define GPIO_RB10_InputEnable()       (TRISBSET = (1<<10))
 #define GPIO_RB10_Get()               ((PORTB >> 10) & 0x1)
 #define GPIO_RB10_PIN                  GPIO_PIN_RB10
+#define GPIO_RB10_InterruptEnable()   (CNENBSET = (1<<10))
+#define GPIO_RB10_InterruptDisable()  (CNENBCLR = (1<<10))
 
 /*** Macros for GPIO_RB11 pin ***/
 #define GPIO_RB11_Set()               (LATBSET = (1<<11))
@@ -169,6 +175,8 @@
 #define GPIO_RB11_InputEnable()       (TRISBSET = (1<<11))
 #define GPIO_RB11_Get()               ((PORTB >> 11) & 0x1)
 #define GPIO_RB11_PIN                  GPIO_PIN_RB11
+#define GPIO_RB11_InterruptEnable()   (CNENBSET = (1<<11))
+#define GPIO_RB11_InterruptDisable()  (CNENBCLR = (1<<11))
 
 /*** Macros for GPIO_RB13 pin ***/
 #define GPIO_RB13_Set()               (LATBSET = (1<<13))
@@ -260,6 +268,7 @@ typedef uint32_t GPIO_PORT;
 
 typedef uint32_t GPIO_PIN;
 
+typedef  void (*GPIO_PIN_CALLBACK) ( GPIO_PIN pin, uintptr_t context);
 
 void GPIO_Initialize(void);
 
@@ -284,6 +293,29 @@ void GPIO_PortToggle(GPIO_PORT port, uint32_t mask);
 void GPIO_PortInputEnable(GPIO_PORT port, uint32_t mask);
 
 void GPIO_PortOutputEnable(GPIO_PORT port, uint32_t mask);
+
+void GPIO_PortInterruptEnable(GPIO_PORT port, uint32_t mask);
+
+void GPIO_PortInterruptDisable(GPIO_PORT port, uint32_t mask);
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Local Data types and Prototypes
+// *****************************************************************************
+// *****************************************************************************
+
+typedef struct {
+
+    /* target pin */
+    GPIO_PIN                 pin;
+
+    /* Callback for event on target pin*/
+    GPIO_PIN_CALLBACK        callback;
+
+    /* Callback Context */
+    uintptr_t               context;
+
+} GPIO_PIN_CALLBACK_OBJ;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -331,6 +363,21 @@ static inline void GPIO_PinOutputEnable(GPIO_PIN pin)
     GPIO_PortOutputEnable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
 }
 
+static inline void GPIO_PinInterruptEnable(GPIO_PIN pin)
+{
+    GPIO_PortInterruptEnable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
+}
+
+static inline void GPIO_PinInterruptDisable(GPIO_PIN pin)
+{
+    GPIO_PortInterruptDisable((GPIO_PORT)(pin>>4), 0x1UL << (pin & 0xFU));
+}
+
+bool GPIO_PinInterruptCallbackRegister(
+    GPIO_PIN pin,
+    const   GPIO_PIN_CALLBACK callback,
+    uintptr_t context
+);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

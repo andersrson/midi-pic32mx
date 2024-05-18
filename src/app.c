@@ -124,9 +124,9 @@ uint8_t readBits; // How many bits have been read
 uint8_t readByte; // temp storage byte currently being deserialized
 uint8_t currentByteIndex; // where will next deserialized byte be saved
 uint8_t midiBytes[4] = { 0, 0, 0, 0 }; // array of deserialized bytes
-uint8_t subsequentOnes = 0; // counter to reset currentByteIndex
+uint8_t consecutiveOnes = 0; // counter to reset currentByteIndex
 
-void timerCallback(uint32_t status, uintptr_t context) {
+void tmrInputRead(uint32_t status, uintptr_t context) {
     GPIO_RA1_Toggle();
     midiPortIn = GPIO_RB5_Get();
     
@@ -140,9 +140,9 @@ void timerCallback(uint32_t status, uintptr_t context) {
             } else {
                 // Reset after a few idle cycles, before we have actual interpretation of MIDI messages
                 if(midiPortIn == 1)
-                    subsequentOnes++;
+                    consecutiveOnes++;
                 
-                if(subsequentOnes > 5) {
+                if(consecutiveOnes > 5) {
                     currentByteIndex = 0;
                 }
             }
@@ -151,6 +151,7 @@ void timerCallback(uint32_t status, uintptr_t context) {
             midiPort1State = DATA_BIT;
             break;
         } case DATA_BIT: {
+            GPIO_RA0_Set();
             readByte += midiPortIn << (readBits++);
             
             if(readBits == 8)
@@ -170,10 +171,40 @@ void timerCallback(uint32_t status, uintptr_t context) {
             
             midiBytes[currentByteIndex++] = readByte;
             midiPort1State = IDLE;
-            subsequentOnes = 0;
+            consecutiveOnes = 0;
             
+            TMR2_Stop();
+            GPIO_RB5_InterruptEnable();
             break;
         }
+    }
+}
+
+void pinChangeNotification(GPIO_PIN pin, uintptr_t context) {
+    if(GPIO_RB5_Get() == 0) {
+        GPIO_RB5_InterruptDisable();
+        midiPort1State = DATA_BIT;
+        
+        readBits = 0;
+        readByte = 0;
+        TMR2_Start();
+    }
+}
+
+void tmrInputInitialize(uint32_t status, uintptr_t context) {
+    
+    if(GPIO_RB5_Get() == 1) {
+        consecutiveOnes++;
+    } else {
+        consecutiveOnes = 0;
+        return;
+    }
+    
+    if(consecutiveOnes > 3) {
+        TMR2_Stop();
+        TMR2_CallbackRegister(&tmrInputRead, 0);
+        GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB5, &pinChangeNotification, 0);
+        GPIO_RB5_InterruptEnable();
     }
 }
 
@@ -182,8 +213,10 @@ void APP_READ_MIDI_Task(void) {
         case READ_MIDI_STATE_INIT: {
             midiPort1State = IDLE;
             
-            TMR2_CallbackRegister(&timerCallback, 1);
+            consecutiveOnes = 0;
+            TMR2_CallbackRegister(&tmrInputInitialize, 0);
             TMR2_Start();
+            
             appData.readMidi1State = READ_MIDI_STATE_READY;
             break;
         } case READ_MIDI_STATE_INIT_ERR: {

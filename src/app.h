@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include "configuration.h"
 
+#include "SyncedPinReader.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -106,8 +108,10 @@ typedef struct {
     DRV_HANDLE i2cHandle;
     DRV_I2C_ERROR i2cErr;
     uint32_t lastReadStackSize;
-           
+    
     READ_MIDI_STATE readMidi1State;
+    
+    struct PinReader_t PinReader[configPINREADER_MAX];
     
     uint32_t largestTaskStackSize;
     char *taskName;

@@ -111,57 +111,41 @@ void updateTaskStackSizeStats(TaskHandle_t task) {
     }
 }
 
-typedef enum  {
-    IDLE,
-    START_BIT,
-    DATA_BIT, 
-    STOP_BIT
-} MidiInputState;
-
-MidiInputState midiPort1State;
-uint8_t midiPortIn = 0;
-uint8_t readBits; // How many bits have been read
-uint8_t readByte; // temp storage byte currently being deserialized
-uint8_t currentByteIndex; // where will next deserialized byte be saved
-uint8_t midiBytes[4] = { 0, 0, 0, 0 }; // array of deserialized bytes
-uint8_t consecutiveIdleTicks = 0; // counter to reset currentByteIndex
-
 void tmrInputRead(uint32_t status, uintptr_t context) {
-    GPIO_RA1_Toggle();
-    midiPortIn = GPIO_RB5_Get();
     
-    switch(midiPort1State) {
-        case IDLE: {
+    struct PinReader_t *reader = (struct PinReader_t*) context;
+    
+    uint8_t midiPortIn = GPIO_PinRead(reader->Pin);
+    
+    switch(reader->ReaderState) {
+        case PINREAD_IDLE: {
             // Should never happen
             break;
-        } case START_BIT: {
+        } case PINREAD_START_BIT: {
             // Should never happen
             break;
-        } case DATA_BIT: {
-            GPIO_RA0_Set();
-            readByte += midiPortIn << (readBits++);
+        } case PINREAD_DATA_BIT: {
+            reader->ReadByte += midiPortIn << (reader->ReadBits++);
             
-            if(readBits == 8)
-                midiPort1State = STOP_BIT;
+            if(reader->ReadBits == 8)
+                reader->ReaderState = PINREAD_STOP_BIT;
             break;
-        } case STOP_BIT: {
-            GPIO_RA0_Clear();
-            
-            // Check if status byte
-            if((readByte & 0x80) > 0) {
-                currentByteIndex = 0;
+        } case PINREAD_STOP_BIT: {
+            // Check if status byte, if so put it in first byte
+            if((reader->ReadByte & 0x80) > 0) {
+                reader->CurrentByteIndex = 0;
                 
                 // We know we will overwrite byte 1 & 2, but not necessarily the last 2
-                midiBytes[2] = 0;
-                midiBytes[3] = 0;
+                reader->Buffer[2] = 0;
+                reader->Buffer[3] = 0;
             }
             
-            midiBytes[currentByteIndex++] = readByte;
-            midiPort1State = IDLE;
-            consecutiveIdleTicks = 0;
+            reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
+            reader->ReaderState = PINREAD_IDLE;
+            reader->ConsecutiveIdleTicks = 0;
             
-            TMR2_Stop();
-            GPIO_RB5_InterruptEnable();
+            reader->TimerStop();
+            GPIO_PinInterruptEnable(reader->Pin);
             
             break;
         }
@@ -169,41 +153,52 @@ void tmrInputRead(uint32_t status, uintptr_t context) {
 }
 
 void pinChangeNotification(GPIO_PIN pin, uintptr_t context) {
-    if(GPIO_RB5_Get() == 0) {
-        GPIO_RB5_InterruptDisable();
-        midiPort1State = DATA_BIT;
+    if(GPIO_PinRead(pin) == 0) {
+        struct PinReader_t *reader = (struct PinReader_t*) context;
+        GPIO_PinInterruptDisable(reader->Pin);
         
-        readBits = 0;
-        readByte = 0;
-        TMR2_Start();
+        reader->ReaderState = PINREAD_DATA_BIT;
+        
+        reader->ReadBits = 0;
+        reader->ReadByte = 0;
+        reader->TimerStart();
     }
 }
 
 void tmrInputInitialize(uint32_t status, uintptr_t context) {
     
-    if(GPIO_RB5_Get() == 1) {
-        consecutiveIdleTicks++;
-    } else {
-        consecutiveIdleTicks = 0;
-        return;
-    }
+    struct PinReader_t *reader = (struct PinReader_t*) context;
     
-    if(consecutiveIdleTicks > 3) {
-        TMR2_Stop();
-        TMR2_CallbackRegister(&tmrInputRead, 0);
-        GPIO_PinInterruptCallbackRegister(GPIO_PIN_RB5, &pinChangeNotification, 0);
-        GPIO_RB5_InterruptEnable();
+    if(GPIO_PinRead(reader->Pin) == 0) {
+        reader->ConsecutiveIdleTicks = 0;
+        return;  
+    } 
+    
+    reader->ConsecutiveIdleTicks++;
+    if(reader->ConsecutiveIdleTicks > 3) {
+        reader->TimerStop();
+        
+        reader->TimerCallbackRegister(&tmrInputRead, context);
+        GPIO_PinInterruptCallbackRegister(reader->Pin, &pinChangeNotification, context);
+        GPIO_PinInterruptEnable(reader->Pin);
     }
 }
 
 void APP_READ_MIDI_Task(void) {
     switch(appData.readMidi1State) {
         case READ_MIDI_STATE_INIT: {
-            midiPort1State = IDLE;
+            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
             
-            consecutiveIdleTicks = 0;
-            TMR2_CallbackRegister(&tmrInputInitialize, 0);
-            TMR2_Start();
+            reader->ReaderState = PINREAD_IDLE;
+            reader->ConsecutiveIdleTicks = 0;
+            reader->Pin = GPIO_PIN_RB5;
+            reader->TimerStart = &TMR2_Start;
+            reader->TimerStop = &TMR2_Stop;
+            reader->TimerCallbackRegister = &TMR2_CallbackRegister;
+            
+            uintptr_t pr0 = (uintptr_t) reader;
+            reader->TimerCallbackRegister(&tmrInputInitialize, pr0);
+            reader->TimerStart();
             
             appData.readMidi1State = READ_MIDI_STATE_READY;
             break;
@@ -212,7 +207,7 @@ void APP_READ_MIDI_Task(void) {
             break;
         } case READ_MIDI_STATE_READY: {
             
-            vTaskDelay(timer10);
+            vTaskDelay(timer500);
             break;
         } case READ_MIDI_STATE_READING: {
             
@@ -361,15 +356,11 @@ void APP_I2C_Task(void) {
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", midiBytes[0], midiBytes[1], midiBytes[2]);
+            snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", appData.PinReader[0].Buffer[0], appData.PinReader[0].Buffer[1], appData.PinReader[0].Buffer[2]);
             i2cCheckError(HD44780GoTo(appData.lcd, 3, 0));
             i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
 
-            
-            vTaskDelay(timer500);
-            
-            //GPIO_RA0_Toggle();
-            vTaskDelay(timer500);
+            vTaskDelay(timer100);
             
             break;
         }

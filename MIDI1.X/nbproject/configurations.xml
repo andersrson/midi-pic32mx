@@ -108,6 +108,7 @@
       <itemPath>i2c_pcf8574_display.h</itemPath>
       <itemPath>../src/HD44780.h</itemPath>
       <itemPath>../src/midi.h</itemPath>
+      <itemPath>../src/SyncedPinReader.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

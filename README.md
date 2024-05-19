@@ -2,10 +2,11 @@
 goal: make a small, light, and cheap midi merge/thru device.  
 
 ## features
-* multiple inputs - at least 3 - merged into one output stream
+* multiple inputs - merged into one output stream
+    * probably 4 inputs - aligns with pic32mx available timers nicely to make input reading easy
 * multiple outputs - at least 4
 * low latency - try to not be more than 1 byte behind (~32 * 10 = 300 microseconds)
-* midi trs sockets instead of din - it's what the cool kids use these days anyway.
+* midi trs sockets instead of din to minimize space requirements. it's what the cool kids use these days anyway.
 * per-port setting input/output
 
 ## stretch goals

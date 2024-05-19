@@ -97,6 +97,8 @@ extern "C" {
 
 #define configHD44780_NUM_DISPLAYS              1
 
+#define configPINREADER_MAX                     4
+    
 // *****************************************************************************
 // *****************************************************************************
 // Section: Middleware & Other Library Configuration

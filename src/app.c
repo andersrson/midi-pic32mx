@@ -99,8 +99,6 @@ void APP_Initialize ( void ) {
     
     appData.lastReadStackSize = 0;
     appData.largestTaskStackSize = 0;
-    
-    appData.tmr2Ticks = 0;
 }
 
 void updateTaskStackSizeStats(TaskHandle_t task) {
@@ -139,8 +137,11 @@ void tmrInputRead(uint32_t status, uintptr_t context) {
                 reader->Buffer[2] = 0;
                 reader->Buffer[3] = 0;
             }
-            
-            reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
+
+            // discard bytes after byte 4 for now
+            if(reader->CurrentByteIndex < 4)
+                reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
+
             reader->ReaderState = PINREAD_IDLE;
             reader->ConsecutiveIdleTicks = 0;
             
@@ -153,15 +154,18 @@ void tmrInputRead(uint32_t status, uintptr_t context) {
 }
 
 void pinChangeNotification(GPIO_PIN pin, uintptr_t context) {
+    GPIO_PinInterruptDisable(pin);
+        
     if(GPIO_PinRead(pin) == 0) {
         struct PinReader_t *reader = (struct PinReader_t*) context;
-        GPIO_PinInterruptDisable(reader->Pin);
         
         reader->ReaderState = PINREAD_DATA_BIT;
         
         reader->ReadBits = 0;
         reader->ReadByte = 0;
         reader->TimerStart();
+    } else {
+        GPIO_PinInterruptEnable(pin);
     }
 }
 

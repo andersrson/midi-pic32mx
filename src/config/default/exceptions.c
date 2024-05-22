@@ -49,6 +49,7 @@
 #include "device.h"
 #include "definitions.h"
 #include <stdio.h>
+#include "app.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -94,10 +95,10 @@ void _bootstrap_exception_handler(void);
 #define EXCEP_C2E       18U // coprocessor 2
 
 /* Address of instruction that caused the exception. */
-static unsigned int exception_address;
+static volatile unsigned int exception_address;
 
 /* Code identifying the cause of the exception (CP0 Cause register). */
-static uint32_t  exception_code;
+static volatile uint32_t  exception_code;
 
 // </editor-fold>
 

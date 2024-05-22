@@ -115,8 +115,6 @@ typedef struct {
     
     uint32_t largestTaskStackSize;
     char *taskName;
-
-    uint16_t tmr2Ticks;
 } APP_DATA;
 
 extern TaskHandle_t xAPP_Task;

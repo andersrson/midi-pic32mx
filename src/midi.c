@@ -1,3 +1,139 @@
+
+#include "midi.h"
+
+
+const struct MidiString_t MidiStringsStatus[MIDI_STRINGS_MAX_STATUS_TYPES] = {
+    { 
+        .ShortName = "nOff",
+        .FullName = "Note Off"
+    },
+    { 
+        .ShortName = "nOn",
+        .FullName = "Note On"
+    },
+    { 
+        .ShortName = "PAT",
+        .FullName = "Polyphonic Aftertouch"
+    },
+    { 
+        .ShortName = "CC",
+        .FullName = "Control/Mode Change"
+    },
+    { 
+        .ShortName = "PC",
+        .FullName = "Program Change"
+    },
+    { 
+        .ShortName = "ChAT",
+        .FullName = "Channel Aftertouch"
+    },
+    { 
+        .ShortName = "Bnd",
+        .FullName = "Pitch Bend"
+    },
+    { 
+        .ShortName = "SysE",
+        .FullName = "System Exclusive"
+    },
+};
+
+const struct MidiString_t MidiStringsSysex[MIDI_STRINGS_MAX_SYSEX_TYPES] = {
+    { 
+        .ShortName = "SysE",
+        .FullName = "System Exclusive"
+    },
+    { 
+        .ShortName = "TmCd",
+        .FullName = "Midi Time Code"
+    },
+    { 
+        .ShortName = "SPos",
+        .FullName = "Song Position"
+    },
+    { 
+        .ShortName = "SSel",
+        .FullName = "Song Select"
+    },
+    { 
+        .ShortName = "UDef",
+        .FullName = "Undefined"
+    },
+    { 
+        .ShortName = "UDef",
+        .FullName = "Undefined"
+    },
+    { 
+        .ShortName = "Tune",
+        .FullName = "Tuning request"
+    },
+    { 
+        .ShortName = "EOFX",
+        .FullName = "End Of SysEx"
+    },
+    { 
+        .ShortName = "TmCk",
+        .FullName = "Timing Clock"
+    },
+    { 
+        .ShortName = "UDef",
+        .FullName = "Undefined"
+    },
+    { 
+        .ShortName = "Strt",
+        .FullName = "Start"
+    },
+    { 
+        .ShortName = "Cont",
+        .FullName = "Continue"
+    },
+    { 
+        .ShortName = "Stop",
+        .FullName = "Stop"
+    },
+    { 
+        .ShortName = "UDef",
+        .FullName = "Undefined"
+    },
+    { 
+        .ShortName = "ASns",
+        .FullName = "Active Sensing"
+    },
+    { 
+        .ShortName = "Rset",
+        .FullName = "System Reset"
+    },
+};
+
+const char* MidiNoteSharps[MIDI_STRINGS_MAX_NOTES] = {
+    "c",
+    "c#",
+    "d",
+    "d#",
+    "e",
+    "f",
+    "f#",
+    "g",
+    "g#",
+    "a",
+    "a#",
+    "b",         
+};
+const char* MidiNoteFlats[MIDI_STRINGS_MAX_NOTES] = {
+    "c",
+    "db",
+    "d",
+    "eb",
+    "e",
+    "f",
+    "gb",
+    "g",
+    "ab",
+    "a",
+    "bb",
+    "b",         
+};
+
+
 /* ************************************************************************** */
 /** Descriptive File Name
 

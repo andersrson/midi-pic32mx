@@ -360,10 +360,39 @@ void APP_I2C_Task(void) {
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", appData.PinReader[0].Buffer[0], appData.PinReader[0].Buffer[1], appData.PinReader[0].Buffer[2]);
+            uint8_t byte0 = appData.PinReader[0].Buffer[0];
+            uint8_t byte1 = appData.PinReader[0].Buffer[1];
+            uint8_t byte2 = appData.PinReader[0].Buffer[2];
+            
+            const char* byte0Str;
+            char byte1Str[4] = "   ";
+            
+            if(MIDI_IS_SYSEX(byte0)) {
+                MIDI_GET_SYSEX_STRING_SHORT(byte0, byte0Str);
+                
+                if(MIDI_IS_SYSEX_SONG_SEL(byte0)) {
+                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
+                } else if(MIDI_IS_SYSEX_SONG_POS(byte0)) {
+                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x] [%x]", byte0Str, byte1, byte2);
+                } else 
+                    snprintf(appData.displayMessageBuffer, 21, "[%s]            ", byte0Str);
+            } else if(MIDI_IS_STATUS_BYTE(byte0)) {
+                MIDI_GET_STATUS_SHORT_STRING(byte0, byte0Str);
+                
+                if(MIDI_IS_NOTE(byte0)) {
+                    MIDI_GET_NOTE_STRING(byte1, byte1Str);
+                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%s]       ", byte0Str, byte1Str);
+                } else 
+                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
+                
+            } else {
+                snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", byte0, byte1, byte2);
+            }
+            
             i2cCheckError(HD44780GoTo(appData.lcd, 3, 0));
             i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
 
+            GPIO_RA0_Toggle();
             vTaskDelay(timer100);
             
             break;

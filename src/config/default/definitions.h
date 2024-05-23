@@ -65,7 +65,7 @@
 #include "osal/osal.h"
 #include "system/debug/sys_debug.h"
 #include "app.h"
-
+#include "midi.h"
 
 
 // DOM-IGNORE-BEGIN

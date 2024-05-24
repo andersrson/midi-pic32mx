@@ -208,6 +208,7 @@
       <itemPath>../src/app.c</itemPath>
       <itemPath>../src/HD44780.c</itemPath>
       <itemPath>../src/midi.c</itemPath>
+      <itemPath>../src/SyncedPinReader.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

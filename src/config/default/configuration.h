@@ -97,7 +97,8 @@ extern "C" {
 
 #define configHD44780_NUM_DISPLAYS              1
 
-#define configPINREADER_MAX                     4
+#define configPINREADER_COUNT                   4
+#define configPINREADER_BUFFER_SIZE             256
     
 // *****************************************************************************
 // *****************************************************************************

@@ -111,7 +111,7 @@ typedef struct {
     
     READ_MIDI_STATE readMidi1State;
     
-    struct PinReader_t PinReader[configPINREADER_MAX];
+    struct PinReader_t PinReader[configPINREADER_COUNT];
     
     uint32_t largestTaskStackSize;
     char *taskName;
@@ -119,7 +119,7 @@ typedef struct {
 
 extern TaskHandle_t xAPP_Task;
 extern TaskHandle_t xI2C_Task;
-extern TaskHandle_t xREAD_MIDI_Task;
+extern TaskHandle_t xPinReader_Task;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -199,7 +199,7 @@ void APP_Initialize ( void );
     This routine must be called from SYS_Tasks() routine.
  */
 
-void APP_READ_MIDI_Task(void);
+void APP_PinReaderTask(void);
 
 void APP_Task( void );
 

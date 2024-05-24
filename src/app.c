@@ -109,100 +109,21 @@ void updateTaskStackSizeStats(TaskHandle_t task) {
     }
 }
 
-void tmrInputRead(uint32_t status, uintptr_t context) {
-    
-    struct PinReader_t *reader = (struct PinReader_t*) context;
-    
-    uint8_t midiPortIn = GPIO_PinRead(reader->Pin);
-    
-    switch(reader->ReaderState) {
-        case PINREAD_IDLE: {
-            // Should never happen
-            break;
-        } case PINREAD_START_BIT: {
-            // Should never happen
-            break;
-        } case PINREAD_DATA_BIT: {
-            reader->ReadByte += midiPortIn << (reader->ReadBits++);
-            
-            if(reader->ReadBits == 8)
-                reader->ReaderState = PINREAD_STOP_BIT;
-            break;
-        } case PINREAD_STOP_BIT: {
-            // Check if status byte, if so put it in first byte
-            if((reader->ReadByte & 0x80) > 0) {
-                reader->CurrentByteIndex = 0;
-                
-                // We know we will overwrite byte 1 & 2, but not necessarily the last 2
-                reader->Buffer[2] = 0;
-                reader->Buffer[3] = 0;
-            }
-
-            // discard bytes after byte 4 for now
-            if(reader->CurrentByteIndex < 4)
-                reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
-
-            reader->ReaderState = PINREAD_IDLE;
-            reader->ConsecutiveIdleTicks = 0;
-            
-            reader->TimerStop();
-            GPIO_PinInterruptEnable(reader->Pin);
-            
-            break;
-        }
-    }
-}
-
-void pinChangeNotification(GPIO_PIN pin, uintptr_t context) {
-    GPIO_PinInterruptDisable(pin);
-        
-    if(GPIO_PinRead(pin) == 0) {
-        struct PinReader_t *reader = (struct PinReader_t*) context;
-        
-        reader->ReaderState = PINREAD_DATA_BIT;
-        
-        reader->ReadBits = 0;
-        reader->ReadByte = 0;
-        reader->TimerStart();
-    } else {
-        GPIO_PinInterruptEnable(pin);
-    }
-}
-
-void tmrInputInitialize(uint32_t status, uintptr_t context) {
-    
-    struct PinReader_t *reader = (struct PinReader_t*) context;
-    
-    if(GPIO_PinRead(reader->Pin) == 0) {
-        reader->ConsecutiveIdleTicks = 0;
-        return;  
-    } 
-    
-    reader->ConsecutiveIdleTicks++;
-    if(reader->ConsecutiveIdleTicks > 3) {
-        reader->TimerStop();
-        
-        reader->TimerCallbackRegister(&tmrInputRead, context);
-        GPIO_PinInterruptCallbackRegister(reader->Pin, &pinChangeNotification, context);
-        GPIO_PinInterruptEnable(reader->Pin);
-    }
-}
-
-void APP_READ_MIDI_Task(void) {
+void APP_PinReaderTask(void) {
     switch(appData.readMidi1State) {
         case READ_MIDI_STATE_INIT: {
-            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
             
-            reader->ReaderState = PINREAD_IDLE;
-            reader->ConsecutiveIdleTicks = 0;
+            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
             reader->Pin = GPIO_PIN_RB5;
+            reader->ConsecutiveIdleTicks = 0;
             reader->TimerStart = &TMR2_Start;
             reader->TimerStop = &TMR2_Stop;
             reader->TimerCallbackRegister = &TMR2_CallbackRegister;
-            
+    
             uintptr_t pr0 = (uintptr_t) reader;
-            reader->TimerCallbackRegister(&tmrInputInitialize, pr0);
-            reader->TimerStart();
+            
+            TMR2_CallbackRegister(&PinReaderInitialize, pr0);
+            TMR2_Start();
             
             appData.readMidi1State = READ_MIDI_STATE_READY;
             break;
@@ -219,7 +140,7 @@ void APP_READ_MIDI_Task(void) {
         }
     }
     
-    updateTaskStackSizeStats(xREAD_MIDI_Task);
+    updateTaskStackSizeStats(xPinReader_Task);
 }
 
 /******************************************************************************
@@ -360,9 +281,20 @@ void APP_I2C_Task(void) {
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            uint8_t byte0 = appData.PinReader[0].Buffer[0];
-            uint8_t byte1 = appData.PinReader[0].Buffer[1];
-            uint8_t byte2 = appData.PinReader[0].Buffer[2];
+            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
+            
+            if(reader->ReaderState != PINREAD_IDLE)
+                break;
+            
+            uint16_t lastByte = 0;
+            PINREAD_LAST_WRITTEN(lastByte, reader);
+            uint8_t byte0 = reader->Buffer[lastByte];
+            uint8_t byte1 = 0;
+            uint8_t byte2 = 0;
+            while(!MIDI_IS_STATUS_BYTE(byte0)) {
+                PINREAD_PREV_BYTE(lastByte);
+                byte0 = reader->Buffer[lastByte];
+            }
             
             const char* byte0Str;
             char byte1Str[4] = "   ";
@@ -371,14 +303,24 @@ void APP_I2C_Task(void) {
                 MIDI_GET_SYSEX_STRING_SHORT(byte0, byte0Str);
                 
                 if(MIDI_IS_SYSEX_SONG_SEL(byte0)) {
+                    PINREAD_NEXT_BYTE(lastByte);
+                    byte1 = reader->Buffer[lastByte];
+            
                     snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
                 } else if(MIDI_IS_SYSEX_SONG_POS(byte0)) {
+                    PINREAD_NEXT_BYTE(lastByte);
+                    byte1 = reader->Buffer[lastByte];
+                    PINREAD_NEXT_BYTE(lastByte);
+                    byte2 = reader->Buffer[lastByte];
+
                     snprintf(appData.displayMessageBuffer, 21, "[%s] [%x] [%x]", byte0Str, byte1, byte2);
                 } else 
                     snprintf(appData.displayMessageBuffer, 21, "[%s]            ", byte0Str);
             } else if(MIDI_IS_STATUS_BYTE(byte0)) {
                 MIDI_GET_STATUS_SHORT_STRING(byte0, byte0Str);
-                
+                PINREAD_NEXT_BYTE(lastByte);
+                byte1 = reader->Buffer[lastByte];
+                    
                 if(MIDI_IS_NOTE(byte0)) {
                     MIDI_GET_NOTE_STRING(byte1, byte1Str);
                     snprintf(appData.displayMessageBuffer, 21, "[%s] [%s]       ", byte0Str, byte1Str);
@@ -386,6 +328,10 @@ void APP_I2C_Task(void) {
                     snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
                 
             } else {
+                PINREAD_NEXT_BYTE(lastByte);
+                byte1 = reader->Buffer[lastByte];
+                PINREAD_NEXT_BYTE(lastByte);
+                byte2 = reader->Buffer[lastByte];
                 snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", byte0, byte1, byte2);
             }
             

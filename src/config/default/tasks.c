@@ -63,12 +63,10 @@
 /* Handle for the APP_Tasks. */
 TaskHandle_t xAPP_Task;
 TaskHandle_t xI2C_Task;
-TaskHandle_t xREAD_MIDI_Task;
+TaskHandle_t xPinReader_Task;
 
-static void lAPP_Task(  void *pvParameters  )
-{   
-    while(true)
-    {
+static void lAPP_Task(  void *pvParameters  ) {
+    while(true) {
         APP_Task();
     }
 }
@@ -79,9 +77,9 @@ static void lAPP_I2C_Task(void *pvParam) {
     }
 }
 
-static void lAPP_READ_MIDI_Task(void *pvParam) {
+static void lAPP_PinReader_Task(void *pvParam) {
     while(true) {
-        APP_READ_MIDI_Task();
+        APP_PinReaderTask();
     }
 }
 
@@ -125,12 +123,12 @@ void SYS_Tasks ( void )
             1,
             &xI2C_Task);
 
-    (void) xTaskCreate((TaskFunction_t) lAPP_READ_MIDI_Task,
-            "MIDI_IN_TASK",
+    (void) xTaskCreate((TaskFunction_t) lAPP_PinReader_Task,
+            "PinReaderTask",
             512,
             NULL,
             5,
-            &xREAD_MIDI_Task);
+            &xPinReader_Task);
 
     /* Start RTOS Scheduler. */
     

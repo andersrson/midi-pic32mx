@@ -95,10 +95,10 @@ extern "C" {
 #define DRV_I2C_INSTANCES_NUMBER              (1U)
 
 
-#define configHD44780_NUM_DISPLAYS              1
+#define configHD44780_NUM_DISPLAYS              (1U)
 
-#define configPINREADER_COUNT                   4
-#define configPINREADER_BUFFER_SIZE             256
+#define configPINREADER_COUNT                   (4U)
+#define configPINREADER_BUFFER_SIZE             (256U)
     
 // *****************************************************************************
 // *****************************************************************************

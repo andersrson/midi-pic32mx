@@ -147,17 +147,22 @@ void PinReaderOnInput(uint32_t status, uintptr_t context) {
     
     struct PinReader_t *reader = (struct PinReader_t*) context;
     
+    __conditional_software_breakpoint(reader != NULL);
+    
     uint8_t midiPortIn = GPIO_PinRead(reader->Pin);
     
     switch(reader->ReaderState) {
         case PINREAD_NEVER_READ: {
             // Should never happen
+            __conditional_software_breakpoint(true);
             break;
         } case PINREAD_IDLE: {
             // Should never happen
+            __conditional_software_breakpoint(true);
             break;
         } case PINREAD_START_BIT: {
             // Should never happen
+            __conditional_software_breakpoint(true);
             break;
         } case PINREAD_DATA_BIT: {
             reader->ReadByte += midiPortIn << (reader->ReadBits++);
@@ -167,11 +172,13 @@ void PinReaderOnInput(uint32_t status, uintptr_t context) {
             break;
         } case PINREAD_STOP_BIT: {
             
-            if(reader->CurrentByteIndex >= configPINREADER_BUFFER_SIZE)
-                reader->CurrentByteIndex = 0;
+            __conditional_software_breakpoint(reader->CurrentByteIndex < configPINREADER_BUFFER_SIZE);
             
             reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
 
+            if(reader->CurrentByteIndex == configPINREADER_BUFFER_SIZE)
+                reader->CurrentByteIndex = 0;
+            
             reader->ReaderState = PINREAD_IDLE;
             reader->ConsecutiveIdleTicks = 0;
             

@@ -100,7 +100,7 @@ struct PinReader_t {
     PinReaderState ReaderState;
     uint8_t ReadBits;
     uint8_t ReadByte;
-    uint8_t CurrentByteIndex;
+    uint16_t CurrentByteIndex;
     uint8_t ConsecutiveIdleTicks;
     
     PINREAD_TIMER_START_FUNCTION TimerStart;

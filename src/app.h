@@ -103,18 +103,21 @@ typedef struct {
     
     DISPLAY_STATE display1State;
     struct HD44780Instance *lcd;
-    char displayMessageBuffer[21];
+    char displayMessageBuffer[128];
     
     DRV_HANDLE i2cHandle;
     DRV_I2C_ERROR i2cErr;
+    
     uint32_t lastReadStackSize;
+    uint32_t largestTaskStackSize;
+    char *taskName;
+    
+    uint32_t lastReadAvailableHeapBytes;
+    uint32_t availableHeapBytes;
     
     READ_MIDI_STATE readMidi1State;
     
     struct PinReader_t PinReader[configPINREADER_COUNT];
-    
-    uint32_t largestTaskStackSize;
-    char *taskName;
 } APP_DATA;
 
 extern TaskHandle_t xAPP_Task;

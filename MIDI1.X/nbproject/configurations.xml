@@ -105,7 +105,6 @@
         </logicalFolder>
       </logicalFolder>
       <itemPath>../src/app.h</itemPath>
-      <itemPath>i2c_pcf8574_display.h</itemPath>
       <itemPath>../src/HD44780.h</itemPath>
       <itemPath>../src/midi.h</itemPath>
       <itemPath>../src/SyncedPinReader.h</itemPath>

@@ -56,3 +56,4 @@ private/
 .DS_Store
 **/.generated_files/
 
+**/dist/

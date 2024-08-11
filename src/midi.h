@@ -54,7 +54,7 @@ extern "C" {
 #define MIDI_STATUS_UPPER_NIBBLE_MASK       0xF0
 #define MIDI_STATUS_LOWER_NIBBLE_MASK       0x0F
 #define MIDI_STRINGS_MAX_STATUS_TYPES       8
-#define MIDI_STRINGS_MAX_SYSEX_TYPES        16
+#define MIDI_STRINGS_MAX_SYSTEM_TYPES        16
 #define MIDI_STRINGS_MAX_NOTES              12
 
 #define MIDI_STATUS_NOTE_OFF                0x80
@@ -64,24 +64,24 @@ extern "C" {
 #define MIDI_STATUS_PGM_CHG                 0xC0
 #define MIDI_STATUS_CH_AT                   0xD0
 #define MIDI_STATUS_PITCH_BEND              0xE0
-#define MIDI_STATUS_SYSEX                   0xF0
+#define MIDI_STATUS_SYSTEM                   0xF0
 
-#define MIDI_STATUS_SYSEX_SYSEX             0x00
-#define MIDI_STATUS_SYSEX_TIME_CODE         0x01
-#define MIDI_STATUS_SYSEX_SONG_POS          0x02
-#define MIDI_STATUS_SYSEX_SONG_SEL          0x03
-#define MIDI_STATUS_SYSEX_UNDEF1            0x04
-#define MIDI_STATUS_SYSEX_UNDEF2            0x05
-#define MIDI_STATUS_SYSEX_TUNE              0x06
-#define MIDI_STATUS_SYSEX_EOX               0x07
-#define MIDI_STATUS_SYSEX_TIME_CLK          0x08
-#define MIDI_STATUS_SYSEX_UNDEF3            0x09
-#define MIDI_STATUS_SYSEX_START             0x0A
-#define MIDI_STATUS_SYSEX_CONTINUE          0x0B
-#define MIDI_STATUS_SYSEX_STOP              0x0C
-#define MIDI_STATUS_SYSEX_UNDEF4            0x0D
-#define MIDI_STATUS_SYSEX_ACT_SENSE         0x0E
-#define MIDI_STATUS_SYSEX_RESET             0x0F
+#define MIDI_STATUS_SYSTEM_SYSEX             0x00
+#define MIDI_STATUS_SYSTEM_TIME_CODE         0x01
+#define MIDI_STATUS_SYSTEM_SONG_POS          0x02
+#define MIDI_STATUS_SYSTEM_SONG_SEL          0x03
+#define MIDI_STATUS_SYSTEM_UNDEF1            0x04
+#define MIDI_STATUS_SYSTEM_UNDEF2            0x05
+#define MIDI_STATUS_SYSTEM_TUNE              0x06
+#define MIDI_STATUS_SYSTEM_EOX               0x07
+#define MIDI_STATUS_SYSTEM_TIME_CLK          0x08
+#define MIDI_STATUS_SYSTEM_UNDEF3            0x09
+#define MIDI_STATUS_SYSTEM_START             0x0A
+#define MIDI_STATUS_SYSTEM_CONTINUE          0x0B
+#define MIDI_STATUS_SYSTEM_STOP              0x0C
+#define MIDI_STATUS_SYSTEM_UNDEF4            0x0D
+#define MIDI_STATUS_SYSTEM_ACT_SENSE         0x0E
+#define MIDI_STATUS_SYSTEM_RESET             0x0F
 
     /* ************************************************************************** */
     /** Descriptive Constant Name
@@ -119,10 +119,10 @@ struct MidiString_t {
 
 
 extern const struct MidiString_t MidiStringsStatus[MIDI_STRINGS_MAX_STATUS_TYPES];
-extern const struct MidiString_t MidiStringsSysex[MIDI_STRINGS_MAX_SYSEX_TYPES];
+extern const struct MidiString_t MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES];
 extern const char* MidiNoteSharps[MIDI_STRINGS_MAX_NOTES];
 extern const char* MidiNoteFlats[MIDI_STRINGS_MAX_NOTES];
-extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSEX_TYPES];
+extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
     // *****************************************************************************
 
     /** Descriptive Data Type Name
@@ -201,15 +201,17 @@ extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSEX_TYPES];
         }
      */
 
-#define MIDI_IS_STATUS_BYTE(byte) (byte & MIDI_STATUS_BYTE_FLAG)
+//#define MIDI_IS_STATUS_BYTE(byte) ((byte & MIDI_STATUS_BYTE_FLAG) == MIDI_STATUS_BYTE_FLAG && !((byte & MIDI_STATUS_SYSTEM) == MIDI_STATUS_SYSTEM))
+
+#define MIDI_IS_STATUS_BYTE(byte) ((byte & MIDI_STATUS_BYTE_FLAG) == MIDI_STATUS_BYTE_FLAG)
 
 #define MIDI_IS_NOTE_OFF(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_NOTE_OFF)
 #define MIDI_IS_NOTE_ON(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_NOTE_ON)
 #define MIDI_IS_NOTE(byte) (MIDI_IS_NOTE_ON(byte) || MIDI_IS_NOTE_OFF(byte))
 
-#define MIDI_IS_SYSEX(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSEX)
-#define MIDI_IS_SYSEX_SONG_POS(byte) (byte == (MIDI_STATUS_SYSEX | MIDI_STATUS_SYSEX_SONG_POS))
-#define MIDI_IS_SYSEX_SONG_SEL(byte) (byte == (MIDI_STATUS_SYSEX | MIDI_STATUS_SYSEX_SONG_SEL))
+#define MIDI_IS_SYSTEM(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSTEM)
+#define MIDI_IS_SYSTEM_SONG_POS(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_STATUS_SYSTEM_SONG_POS))
+#define MIDI_IS_SYSTEM_SONG_SEL(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_STATUS_SYSTEM_SONG_SEL))
 
         
 #define MIDI_GET_STATUS_SHORT_STRING(byte, str)                                 \
@@ -226,14 +228,14 @@ do {                                                    \
     str[2] = '0' + byte / 12;                           \
 } while (0)
 
-#define MIDI_GET_SYSEX_STRING_SHORT(byte, str)                                  \
+#define MIDI_GET_SYSTEM_STRING_SHORT(byte, str)                                  \
 do {                                                                            \
-    str = MidiStringsSysex[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].ShortName;   \
+    str = MidiStringsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].ShortName;   \
 } while (0)
 
-#define MIDI_GET_SYSEX_STRING_FULL(byte, str)                                   \
+#define MIDI_GET_SYSTEM_STRING_FULL(byte, str)                                   \
 do {                                                                            \
-    str = MidiStringsSysex[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].FullName;   \
+    str = MidiStringsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].FullName;   \
 } while (0)
 
 

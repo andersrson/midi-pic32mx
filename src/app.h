@@ -34,6 +34,7 @@
 #include "configuration.h"
 
 #include "SyncedPinReader.h"
+#include "DataProcessor.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -96,6 +97,32 @@ typedef enum {
     Application strings and buffers are be defined outside this structure.
  */
 
+
+struct MidiTransform {
+    
+};
+
+struct MidiFilter {
+    
+};
+
+struct Project {
+    bool displayFilterMidiTime;
+    bool displayFilterMidiNoteOff;
+};
+        
+struct DeviceConfig {
+    
+    
+};
+
+struct UserData{
+    struct DeviceConfig devConfig;
+    struct Project *currentProject;
+    struct Project projects[configMAX_USER_PROJECTS];
+    uint16_t lastUsedProject;
+};
+
 typedef struct {
     /* The application's current state */
     APP_STATES state;
@@ -115,6 +142,8 @@ typedef struct {
     uint32_t lastReadAvailableHeapBytes;
     uint32_t availableHeapBytes;
     
+    struct UserData userData;
+    
     READ_MIDI_STATE readMidi1State;
     
     struct PinReader_t PinReader[configPINREADER_COUNT];
@@ -122,7 +151,7 @@ typedef struct {
 
 extern TaskHandle_t xAPP_Task;
 extern TaskHandle_t xI2C_Task;
-extern TaskHandle_t xPinReader_Task;
+extern TaskHandle_t xDataProcessor_Task;
 
 // *****************************************************************************
 // *****************************************************************************

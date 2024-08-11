@@ -37,7 +37,7 @@ const struct MidiString_t MidiStringsStatus[MIDI_STRINGS_MAX_STATUS_TYPES] = {
     },
 };
 
-const struct MidiString_t MidiStringsSysex[MIDI_STRINGS_MAX_SYSEX_TYPES] = {
+const struct MidiString_t MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
     { 
         .ShortName = "SysE",
         .FullName = "System Exclusive"

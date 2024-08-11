@@ -74,7 +74,7 @@ void GPIO_Initialize ( void )
     ANSELBCLR = 0xe00c; /* Digital Mode Enable */
     /* Change Notice Enable */
     CNCONBSET = _CNCONB_ON_MASK;
-    PORTB;
+
     IEC1SET = _IEC1_CNBIE_MASK;
 
 

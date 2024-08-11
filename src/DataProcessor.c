@@ -24,11 +24,15 @@
 /* This section lists the other files that are included in this file.
  */
 
-/* TODO:  Include other files here if needed. */
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "config/default/definitions.h"
 
-#include "SyncedPinReader.h"
+#include "DataProcessor.h"
+
+/* TODO:  Include other files here if needed. */
+
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -57,6 +61,8 @@
   @Remarks
     Any additional remarks
  */
+int global_data;
+
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -113,30 +119,8 @@
         return 3;
     }
  */
+//static int ExampleLocalFunction(int param1, int param2) {    return 0; }
 
-
-void lPinReaderPinChanged(GPIO_PIN pin, uintptr_t context) {
-    GPIO_PinInterruptDisable(pin);
-    struct PinReader_t *reader = (struct PinReader_t*) context;
-        
-    if(GPIO_PinRead(pin) == 0) {
-        reader->ReaderState = PINREAD_DATA_BIT;
-        
-        reader->ReadBits = 0;
-        reader->ReadByte = 0;
-        reader->TimerStart();
-        
-        if(reader->EmitDebug) {
-            GPIO_PinWrite(reader->DebugPin, true);
-        }
-    } else {
-        if(reader->EmitDebug) {
-            GPIO_PinWrite(reader->DebugPin, false);
-        }
-        
-        GPIO_PinInterruptEnable(pin);
-    }
-}
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -150,87 +134,35 @@ void lPinReaderPinChanged(GPIO_PIN pin, uintptr_t context) {
 
 // *****************************************************************************
 
-static volatile uint32_t lPinsState;
+/** 
+  @Function
+    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
 
-void PinReaderOnInput(uint32_t status, uintptr_t context) {
-    
-    struct PinReader_t *reader = (struct PinReader_t*) context;
-    
-    __conditional_software_breakpoint(reader != NULL);
-    
-    // lPinsState = ~reader->Pin & lPinsState;
-    // lPinsState = lPinsState | ((reader->Pin) & GPIO_PortRead((GPIO_PORT)reader->Pin));
-    // uint8_t midiPortIn = GPIO_PinRead(reader->Pin);
-    reader->PortIn = GPIO_PinRead(reader->Pin);
-    
-    switch(reader->ReaderState) {
-        case PINREAD_NEVER_READ: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_IDLE: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_START_BIT: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_DATA_BIT: {
-            // reader->ReadByte += ((lPinsState & reader->Pin) == 0 ? 0 : 1) << (reader->ReadBits++);
-            // reader->ReadByte += midiPortIn << (reader->ReadBits++);
-            reader->ReadByte += reader->PortIn << (reader->ReadBits++);
-            if(reader->ReadBits == 8)
-                reader->ReaderState = PINREAD_STOP_BIT;
-            break;
-        } case PINREAD_STOP_BIT: {
-            
-            __conditional_software_breakpoint(reader->CurrentByteIndex < configPINREADER_BUFFER_SIZE);
-            
-            reader->Buffer[reader->CurrentByteIndex++] = reader->ReadByte;
+  @Summary
+    Brief one-line description of the function.
 
-            if(reader->CurrentByteIndex == configPINREADER_BUFFER_SIZE)
-                reader->CurrentByteIndex = 0;
-            
-            reader->ReaderState = PINREAD_IDLE;
-            reader->ConsecutiveIdleTicks = 0;
-            
-            reader->TimerStop();
-            
-            if(reader->EmitDebug) {
-                GPIO_PinWrite(reader->DebugPin, false);
-            }
-            GPIO_PinInterruptEnable(reader->Pin);
-            
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            vTaskNotifyGiveFromISR(xDataProcessor_Task, &xHigherPriorityTaskWoken);
-            
-            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-            break;
-        }
-    }
-}
-
-void PinReaderInitialize(uint32_t status, uintptr_t context) {
+  @Remarks
+    Refer to the example_file.h interface header for function usage details.
+ */
+void DataProcessorTask(void) {
+    uint32_t notifyValue = 0;
+    TickType_t timeout = pdMS_TO_TICKS(100);
     
-    struct PinReader_t *reader = (struct PinReader_t*) context;
+    GPIO_RB2_Clear();
     
-    reader->ReaderState = PINREAD_NEVER_READ;
-    
-    if(GPIO_PinRead(reader->Pin) == 0) {
-        reader->ConsecutiveIdleTicks = 0;
-        return;  
-    } 
-    
-    reader->ConsecutiveIdleTicks++;
-    if(reader->ConsecutiveIdleTicks > 3) {
-        reader->TimerStop();
+    while(true) {
+        GPIO_RB2_Clear();
+        notifyValue = ulTaskNotifyTake(true, timeout);
         
-        reader->TimerCallbackRegister(&PinReaderOnInput, context);
-        GPIO_PinInterruptCallbackRegister(reader->Pin, &lPinReaderPinChanged, context);
-        GPIO_PinInterruptEnable(reader->Pin);
+        if(notifyValue > 0) {
+            GPIO_RB2_Set();
+        } else {
+            GPIO_RB2_Clear();
+        }
+        
     }
 }
+
 
 /* *****************************************************************************
  End of File

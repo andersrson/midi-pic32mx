@@ -2,16 +2,16 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Anders Runesson
 
   @File Name
-    filename.c
+    DataProcessor.c
 
   @Summary
-    Brief description of the file.
+    Applies filtering, modifiers, and routing of MIDI messages.
 
   @Description
-    Describe the purpose of this file.
+    
  */
 /* ************************************************************************** */
 
@@ -26,12 +26,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "config/default/definitions.h"
 
 #include "DataProcessor.h"
-
-/* TODO:  Include other files here if needed. */
 
 
 /* ************************************************************************** */
@@ -61,7 +60,6 @@
   @Remarks
     Any additional remarks
  */
-int global_data;
 
 
 /* ************************************************************************** */
@@ -119,8 +117,6 @@ int global_data;
         return 3;
     }
  */
-//static int ExampleLocalFunction(int param1, int param2) {    return 0; }
-
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -146,19 +142,34 @@ int global_data;
  */
 void DataProcessorTask(void) {
     uint32_t notifyValue = 0;
-    TickType_t timeout = pdMS_TO_TICKS(100);
+    //TickType_t timeout = pdMS_TO_TICKS(100);
+    uint32_t interruptStatus = 0;
     
+    GPIO_RA1_Clear();
     GPIO_RB2_Clear();
     
     while(true) {
+        GPIO_RA1_Clear();
         GPIO_RB2_Clear();
-        notifyValue = ulTaskNotifyTake(true, timeout);
         
-        if(notifyValue > 0) {
-            GPIO_RB2_Set();
-        } else {
-            GPIO_RB2_Clear();
+        notifyValue = xTaskNotifyWait(
+                0x00,
+                ULONG_MAX,
+                &interruptStatus,
+                portMAX_DELAY);
+        
+        if(notifyValue < 1) {
+            continue;
         }
+        
+        if((interruptStatus & 0x01) != 0) {
+            GPIO_RA1_Set();
+        }
+        if((interruptStatus & 0x02) != 0) {
+            GPIO_RB2_Set();
+        }
+        
+        vTaskDelay(timer50);
         
     }
 }

@@ -2,21 +2,20 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Anders Runesson
 
   @File Name
-    filename.h
+    DataProcessor.h
 
   @Summary
-    Brief description of the file.
+    Applies filtering, modifiers, and routing of MIDI messages.
 
   @Description
-    Describe the purpose of this file.
  */
 /* ************************************************************************** */
 
-#ifndef _DATAPROCESSOR_H    /* Guard against multiple inclusion */
-#define _DATAPROCESSOR_H
+#ifndef _DATA_PROCESSOR_H    /* Guard against multiple inclusion */
+#define _DATA_PROCESSOR_H
 
 
 /* ************************************************************************** */
@@ -78,6 +77,9 @@ extern "C" {
         banner.
      */
 
+    struct DataProcessor {
+        
+    };
 
     // *****************************************************************************
 
@@ -165,7 +167,7 @@ extern "C" {
 }
 #endif
 
-#endif /* _DATAPROCESSOR_H */
+#endif /* _DATA_PROCESSOR_H */
 
 /* *****************************************************************************
  End of File

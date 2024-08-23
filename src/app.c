@@ -112,10 +112,8 @@ void APP_Initialize ( void ) {
     uintptr_t up_reader = 0;
 
     reader->Pin = GPIO_PIN_RB5;
-
-    reader->DebugPin = GPIO_PIN_RA1;
-    reader->EmitDebug = false;
-
+    reader->FlagId = 0x01;
+    
     reader->ConsecutiveIdleTicks = 0;
     reader->TimerStart = &TMR2_Start;
     reader->TimerStop = &TMR2_Stop;
@@ -125,13 +123,11 @@ void APP_Initialize ( void ) {
 
     TMR2_CallbackRegister(&PinReaderInitialize, up_reader);
 
-
     reader = (struct PinReader_t*) &appData.PinReader[1];
+    
     reader->Pin = GPIO_PIN_RB7;
-
-    reader->DebugPin = GPIO_PIN_RB2;
-    reader->EmitDebug = false;
-
+    reader->FlagId = 0x02;
+    
     reader->ConsecutiveIdleTicks = 0;
     reader->TimerStart = &TMR3_Start;
     reader->TimerStop = &TMR3_Stop;
@@ -254,7 +250,7 @@ void printMidi(struct PinReader_t *reader, uint8_t lcdLine, uint8_t lcdCol) {
     uint16_t lastByteIndex = 0;
     uint16_t lastByteSafety = 0; 
     uint8_t byte0 = 0;
-    uint8_t byte0_value = 0;        // Lower nibble of first byte
+    //uint8_t byte0_value = 0;        // Lower nibble of first byte
     uint8_t byte1 = 0;
     uint8_t byte2 = 0;
     const char* byte0Str;
@@ -275,10 +271,12 @@ void printMidi(struct PinReader_t *reader, uint8_t lcdLine, uint8_t lcdCol) {
         __conditional_software_breakpoint(lastByteIndex < configPINREADER_BUFFER_SIZE);
         byte0 = reader->Buffer[lastByteIndex];
     }
-    byte0_value = byte0 & MIDI_STATUS_LOWER_NIBBLE_MASK;
+    //byte0_value = byte0 & MIDI_STATUS_LOWER_NIBBLE_MASK;
     
     if(MIDI_IS_SYSTEM(byte0)) {
-        if((byte0_value & 0x01) == 1 || (byte0_value & 0x08) == 0x08) {
+        
+        // Filter MIDI time code messages from flooding display
+        if(MIDI_GET_STATUS_VALUE(byte0) == MIDI_STATUS_SYSTEM_TIME_CODE || MIDI_GET_STATUS_VALUE(byte0) == MIDI_STATUS_SYSTEM_TIME_CLK) {
             if(appData.userData.currentProject->displayFilterMidiTime)
                 return;
         }

@@ -2,16 +2,15 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Anders Runesson
 
   @File Name
-    filename.h
+    midi.h
 
   @Summary
-    Brief description of the file.
+    MIDI definitions
 
   @Description
-    Describe the purpose of this file.
  */
 /* ************************************************************************** */
 
@@ -25,12 +24,6 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
-/* This section lists the other files that are included in this file.
- */
-
-/* TODO:  Include other files here if needed. */
-
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
@@ -83,34 +76,54 @@ extern "C" {
 #define MIDI_STATUS_SYSTEM_ACT_SENSE         0x0E
 #define MIDI_STATUS_SYSTEM_RESET             0x0F
 
-    /* ************************************************************************** */
-    /** Descriptive Constant Name
+/* ************************************************************************** */
+/** Descriptive Constant Name
 
-      @Summary
-        Brief one-line summary of the constant.
-    
-      @Description
-        Full description, explaining the purpose and usage of the constant.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
-    
-      @Remarks
-        Any additional remarks
-     */
+  @Summary
+    Brief one-line summary of the constant.
+
+  @Description
+    Full description, explaining the purpose and usage of the constant.
+    <p>
+    Additional description in consecutive paragraphs separated by HTML 
+    paragraph breaks, as necessary.
+    <p>
+    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+
+  @Remarks
+    Any additional remarks
+ */
 
 
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Data Types
-    // *****************************************************************************
-    // *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
 
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
+
+// *****************************************************************************
+
+/** Descriptive Data Type Name
+
+  @Summary
+    Brief one-line summary of the data type.
+
+  @Description
+    Full description, explaining the purpose and usage of the data type.
+    <p>
+    Additional description in consecutive paragraphs separated by HTML 
+    paragraph breaks, as necessary.
+    <p>
+    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+
+  @Remarks
+    Any additional remarks
+    <p>
+    Describe enumeration elements and structure and union members above each 
+    element or member.
+ */
+
 
 struct MidiString_t {
     char* ShortName;
@@ -123,83 +136,61 @@ extern const struct MidiString_t MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES
 extern const char* MidiNoteSharps[MIDI_STRINGS_MAX_NOTES];
 extern const char* MidiNoteFlats[MIDI_STRINGS_MAX_NOTES];
 extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
-    // *****************************************************************************
 
-    /** Descriptive Data Type Name
+// *****************************************************************************
+// *****************************************************************************
+// Section: Interface Functions
+// *****************************************************************************
+// *****************************************************************************
 
-      @Summary
-        Brief one-line summary of the data type.
-    
-      @Description
-        Full description, explaining the purpose and usage of the data type.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
 
-      @Remarks
-        Any additional remarks
-        <p>
-        Describe enumeration elements and structure and union members above each 
-        element or member.
-     */
+// *****************************************************************************
+/**
+  @Function
+    int ExampleFunctionName ( int param1, int param2 ) 
 
+  @Summary
+    Brief one-line description of the function.
 
-    // *****************************************************************************
-    // *****************************************************************************
-    // Section: Interface Functions
-    // *****************************************************************************
-    // *****************************************************************************
+  @Description
+    Full description, explaining the purpose and usage of the function.
+    <p>
+    Additional description in consecutive paragraphs separated by HTML 
+    paragraph breaks, as necessary.
+    <p>
+    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
 
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
+  @Precondition
+    List and describe any required preconditions. If there are no preconditions,
+    enter "None."
 
-    // *****************************************************************************
-    /**
-      @Function
-        int ExampleFunctionName ( int param1, int param2 ) 
+  @Parameters
+    @param param1 Describe the first parameter to the function.
 
-      @Summary
-        Brief one-line description of the function.
+    @param param2 Describe the second parameter to the function.
 
-      @Description
-        Full description, explaining the purpose and usage of the function.
-        <p>
-        Additional description in consecutive paragraphs separated by HTML 
-        paragraph breaks, as necessary.
-        <p>
-        Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+  @Returns
+    List (if feasible) and describe the return values of the function.
+    <ul>
+      <li>1   Indicates an error occurred
+      <li>0   Indicates an error did not occur
+    </ul>
 
-      @Precondition
-        List and describe any required preconditions. If there are no preconditions,
-        enter "None."
+  @Remarks
+    Describe any special behavior not described above.
+    <p>
+    Any additional remarks.
 
-      @Parameters
-        @param param1 Describe the first parameter to the function.
-    
-        @param param2 Describe the second parameter to the function.
-
-      @Returns
-        List (if feasible) and describe the return values of the function.
-        <ul>
-          <li>1   Indicates an error occurred
-          <li>0   Indicates an error did not occur
-        </ul>
-
-      @Remarks
-        Describe any special behavior not described above.
-        <p>
-        Any additional remarks.
-
-      @Example
-        @code
-        if(ExampleFunctionName(1, 2) == 0)
-        {
-            return 3;
-        }
-     */
+  @Example
+    @code
+    if(ExampleFunctionName(1, 2) == 0)
+    {
+        return 3;
+    }
+ */
 
 //#define MIDI_IS_STATUS_BYTE(byte) ((byte & MIDI_STATUS_BYTE_FLAG) == MIDI_STATUS_BYTE_FLAG && !((byte & MIDI_STATUS_SYSTEM) == MIDI_STATUS_SYSTEM))
 
@@ -213,7 +204,8 @@ extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
 #define MIDI_IS_SYSTEM_SONG_POS(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_STATUS_SYSTEM_SONG_POS))
 #define MIDI_IS_SYSTEM_SONG_SEL(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_STATUS_SYSTEM_SONG_SEL))
 
-        
+#define MIDI_GET_STATUS_VALUE(byte) (byte & MIDI_STATUS_LOWER_NIBBLE_MASK)
+    
 #define MIDI_GET_STATUS_SHORT_STRING(byte, str)                                 \
 do {                                                                            \
     str = MidiStringsStatus[(byte & MIDI_STATUS_TYPE_MASK) >> 4].ShortName;     \

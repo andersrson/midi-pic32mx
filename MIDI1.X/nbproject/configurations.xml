@@ -109,6 +109,7 @@
       <itemPath>../src/midi.h</itemPath>
       <itemPath>../src/SyncedPinReader.h</itemPath>
       <itemPath>../src/DataProcessor.h</itemPath>
+      <itemPath>../src/DataFilter.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -210,6 +211,7 @@
       <itemPath>../src/midi.c</itemPath>
       <itemPath>../src/SyncedPinReader.c</itemPath>
       <itemPath>../src/DataProcessor.c</itemPath>
+      <itemPath>../src/DataFilter.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

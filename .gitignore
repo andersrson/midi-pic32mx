@@ -41,6 +41,8 @@
 *.su
 *.idb
 *.pdb
+*.log
+*.inx
 
 # Kernel Module Compile Results
 *.mod*
@@ -51,9 +53,15 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+_build/
+.vscode/
+cmake/
 private/
+build/
+debug/
+out/
 
 .DS_Store
-**/.generated_files/
+.generated_files/
 
 **/dist/

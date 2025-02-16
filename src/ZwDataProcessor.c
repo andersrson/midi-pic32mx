@@ -30,7 +30,7 @@
 
 #include "config/default/definitions.h"
 
-#include "DataProcessor.h"
+#include "ZwDataProcessor.h"
 
 
 /* ************************************************************************** */
@@ -140,7 +140,7 @@
   @Remarks
     Refer to the example_file.h interface header for function usage details.
  */
-void DataProcessorTask(void) {
+void ZwDataProcessorTask(void) {
     uint32_t notifyValue = 0;
     //TickType_t timeout = pdMS_TO_TICKS(100);
     uint32_t interruptStatus = 0;

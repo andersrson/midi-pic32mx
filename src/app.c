@@ -29,8 +29,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "definitions.h"
-
 #include "app.h"
 #include "HD44780.h"
 
@@ -108,7 +106,7 @@ void APP_Initialize ( void ) {
     appData.userData.currentProject->displayFilterMidiTime = true;
     appData.userData.currentProject->displayFilterMidiNoteOff = true;
     
-    struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
+    struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
     uintptr_t up_reader = 0;
 
     reader->Pin = GPIO_PIN_RB5;
@@ -121,9 +119,9 @@ void APP_Initialize ( void ) {
 
     up_reader = (uintptr_t) reader;
 
-    TMR2_CallbackRegister(&PinReaderInitialize, up_reader);
+    TMR2_CallbackRegister(&ZwPinReaderInitialize, up_reader);
 
-    reader = (struct PinReader_t*) &appData.PinReader[1];
+    reader = (struct ZwPinReader*) &appData.PinReader[1];
     
     reader->Pin = GPIO_PIN_RB7;
     reader->FlagId = 0x02;
@@ -135,12 +133,15 @@ void APP_Initialize ( void ) {
 
     up_reader = (uintptr_t) reader;
 
-    TMR3_CallbackRegister(&PinReaderInitialize, up_reader);
+    TMR3_CallbackRegister(&ZwPinReaderInitialize, up_reader);
 
 }
 
 void updateTaskStackSizeStats(TaskHandle_t task) {
-    uint32_t size = uxTaskGetStackHighWaterMark(task);
+    
+    // uxTaskGetStackHighWaterMark() returns the smallest amount of free stack 
+    // space available since the task was started. 
+    uint32_t size = configTASK_STACK_SIZE - uxTaskGetStackHighWaterMark(task);
     
     if(size > appData.largestTaskStackSize) {
         appData.largestTaskStackSize = size;
@@ -150,28 +151,6 @@ void updateTaskStackSizeStats(TaskHandle_t task) {
     uint32_t heap = xPortGetFreeHeapSize();
     if(heap > appData.availableHeapBytes)
         appData.availableHeapBytes = heap;
-}
-
-void APP_PinReaderTask(void) {
-    switch(appData.readMidi1State) {
-        case READ_MIDI_STATE_INIT: {
-            
-            appData.readMidi1State = READ_MIDI_STATE_READY;
-            break;
-        } case READ_MIDI_STATE_INIT_ERR: {
-            
-            break;
-        } case READ_MIDI_STATE_READY: {
-            
-            vTaskDelay(timer500);
-            break;
-        } case READ_MIDI_STATE_READING: {
-            
-            break;
-        }
-    }
-    
-    updateTaskStackSizeStats(xDataProcessor_Task);
 }
 
 /******************************************************************************
@@ -236,7 +215,7 @@ bool i2cCheckError(bool input) {
 }
 
 
-void printMidi(struct PinReader_t *reader, uint8_t lcdLine, uint8_t lcdCol) {
+void printMidi(struct ZwPinReader *reader, uint8_t lcdLine, uint8_t lcdCol) {
 
     __conditional_software_breakpoint(reader != NULL);
 
@@ -276,7 +255,7 @@ void printMidi(struct PinReader_t *reader, uint8_t lcdLine, uint8_t lcdCol) {
     if(MIDI_IS_SYSTEM(byte0)) {
         
         // Filter MIDI time code messages from flooding display
-        if(MIDI_GET_STATUS_VALUE(byte0) == MIDI_STATUS_SYSTEM_TIME_CODE || MIDI_GET_STATUS_VALUE(byte0) == MIDI_STATUS_SYSTEM_TIME_CLK) {
+        if(MIDI_GET_STATUS_VALUE(byte0) == MIDI_SYSTEM_COMMON_TIME_CODE || MIDI_GET_STATUS_VALUE(byte0) == MIDI_SYSTEM_REALTIME_TIME_CLK) {
             if(appData.userData.currentProject->displayFilterMidiTime)
                 return;
         }
@@ -302,7 +281,7 @@ void printMidi(struct PinReader_t *reader, uint8_t lcdLine, uint8_t lcdCol) {
                 return;
         }
         
-        MIDI_GET_STATUS_SHORT_STRING(byte0, byte0Str);
+        MIDI_GET_CHANNEL_SHORT_STRING(byte0, byte0Str);
         PINREAD_NEXT_BYTE(lastByteIndex);
         byte1 = reader->Buffer[lastByteIndex];
 
@@ -405,9 +384,9 @@ void APP_I2C_Task(void) {
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
+            struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
             printMidi(reader, 2, 0);
-            reader = (struct PinReader_t*) &appData.PinReader[1];
+            reader = (struct ZwPinReader*) &appData.PinReader[1];
             printMidi(reader, 3, 0);
             
             GPIO_RA0_Toggle();

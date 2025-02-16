@@ -5,17 +5,17 @@
     Anders Runesson
 
   @File Name
-    SyncedPinReader.h
+    DataProcessor.h
 
   @Summary
-    Reads MIDI bit stream, synced to start bit @ 31250bps
+    Applies filtering, modifiers, and routing of MIDI messages.
 
   @Description
  */
 /* ************************************************************************** */
 
-#ifndef _SYNCED_PIN_READER_H    /* Guard against multiple inclusion */
-#define _SYNCED_PIN_READER_H
+#ifndef _ZWDATAPROCESSOR_H    /* Guard against multiple inclusion */
+#define _ZWDATAPROCESSOR_H
 
 
 /* ************************************************************************** */
@@ -23,11 +23,6 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
-/* This section lists the other files that are included in this file.
- */
-
-/* TODO:  Include other files here if needed. */
 
 
 /* Provide C++ Compatibility */
@@ -65,6 +60,8 @@ extern "C" {
         Any additional remarks
      */
 
+
+
     // *****************************************************************************
     // *****************************************************************************
     // Section: Data Types
@@ -75,53 +72,13 @@ extern "C" {
         banner.
      */
 
-// Callback function for starting the timer
-typedef void (*PINREAD_TIMER_START_FUNCTION)(void);
-
-// Callback function for stopping the timer
-typedef void (*PINREAD_TIMER_STOP_FUNCTION)(void);
-
-// Callback function for registering the pin reader's callback function with the timer.
-typedef void (*PINREAD_TIMER_CALLBACK_REGISTER_FUNCTION)( TMR_CALLBACK callback_fn, uintptr_t context );
-
-typedef enum  {
-    PINREAD_NEVER_READ,
-    PINREAD_IDLE,
-    PINREAD_START_BIT,
-    PINREAD_DATA_BIT, 
-    PINREAD_STOP_BIT
-} PinReaderState;
-
-struct PinReader_t {
+    struct ZwPinReadState {
+        
+    };
     
-    uint8_t FlagId; 
-    GPIO_PIN Pin;
-    
-    PinReaderState ReaderState;
-    uint8_t PortIn;
-    uint8_t ReadBits;
-    uint8_t ReadByte;
-    uint16_t CurrentByteIndex;
-    uint8_t ConsecutiveIdleTicks;
-    
-    PINREAD_TIMER_START_FUNCTION TimerStart;
-    PINREAD_TIMER_STOP_FUNCTION TimerStop;
-    PINREAD_TIMER_CALLBACK_REGISTER_FUNCTION TimerCallbackRegister;
-    
-    uint8_t Buffer[configPINREADER_BUFFER_SIZE];
-};
-
-/**
- * PINREAD_lastByte must be large enough to hold the PinReader buffer size. E.g. if
- * configPINREADER_BUFFER_SIZE is greater than 255, PINREAD_lastByte must be at 
- * least uint16_t. 
- * @param PINREAD_lastByte integer Index to last written byte
- * @param PINREAD_preader Pointer to PinReader struct
- */
-#define PINREAD_LAST_WRITTEN(PINREAD_lastByte, PINREAD_preader) (PINREAD_lastByte = (PINREAD_preader->CurrentByteIndex - 1) % configPINREADER_BUFFER_SIZE)
-
-#define PINREAD_NEXT_BYTE(PINREAD_index) (PINREAD_index = (PINREAD_index + 1) % configPINREADER_BUFFER_SIZE)
-#define PINREAD_PREV_BYTE(PINREAD_index) (PINREAD_index = (PINREAD_index - 1) % configPINREADER_BUFFER_SIZE)
+    struct ZwDataProcessor {
+        
+    };
 
     // *****************************************************************************
 
@@ -145,8 +102,6 @@ struct PinReader_t {
         element or member.
      */
     
-    
-
 
     // *****************************************************************************
     // *****************************************************************************
@@ -159,10 +114,9 @@ struct PinReader_t {
      */
 
     // *****************************************************************************
-
     /**
       @Function
-        void PinReaderOnInput ( uint32_t status, uintptr_t context ) 
+        int ExampleFunctionName ( int param1, int param2 ) 
 
       @Summary
         Brief one-line description of the function.
@@ -203,30 +157,16 @@ struct PinReader_t {
             return 3;
         }
      */
-void PinReaderOnInput(uint32_t status, uintptr_t context);
+    
+    void ZwDataProcessorTask(void);
 
-/**
- * @Function
- *      void pinReaderInitialize(uint32_t status, uintptr_t context)
- * @Summary
- *      Initialize a PinReader to start reading from an input pin.
- *      This function is first set as the timer callback and the 
- *      timer is started. In order to avoid reading partial bytes the
- *      function will wait until 3 consecutive idle cycles have been 
- *      detected. At that point it will replace itself with the pin reader's 
- *      callback.
- *      
- * @param status uint32_t Timer callback value, not used
- * @param context uintptr_t Pointer to pin reader struct
- */
-void PinReaderInitialize(uint32_t status, uintptr_t context);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _SYNCED_PIN_READER_H */
+#endif /* _ZWDATAPROCESSOR_H */
 
 /* *****************************************************************************
  End of File

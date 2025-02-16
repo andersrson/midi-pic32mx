@@ -96,8 +96,12 @@ extern "C" {
 
 #define configHD44780_NUM_DISPLAYS              (1U)
 
-#define configPINREADER_COUNT                   (4U)
-#define configPINREADER_BUFFER_SIZE             (64U)
+#define configPINREADER_COUNT                   (2U)
+#define configPINREADER_BUFFER_SIZE             (256U)
+#define configOUTPUT_COUNT                      (4U)
+#define configOUTPUT_BUFFER_SIZE                (128U)
+
+#define configTASK_STACK_SIZE                   (1024)
     
 #define configMAX_USER_PROJECTS                 (2U)
 

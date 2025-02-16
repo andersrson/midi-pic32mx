@@ -5,17 +5,18 @@
     Anders Runesson
 
   @File Name
-    DataProcessor.h
+    DataModifier.h
 
   @Summary
-    Applies filtering, modifiers, and routing of MIDI messages.
+    Midi modifier.
 
   @Description
+    
  */
 /* ************************************************************************** */
 
-#ifndef _DATA_PROCESSOR_H    /* Guard against multiple inclusion */
-#define _DATA_PROCESSOR_H
+#ifndef _DATA_MODIFIER_H_    /* Guard against multiple inclusion */
+#define _DATA_MODIFIER_H_
 
 
 /* ************************************************************************** */
@@ -65,8 +66,6 @@ extern "C" {
         Any additional remarks
      */
 
-
-
     // *****************************************************************************
     // *****************************************************************************
     // Section: Data Types
@@ -77,7 +76,7 @@ extern "C" {
         banner.
      */
 
-    struct DataProcessor {
+    struct DataModifier {
         
     };
 
@@ -102,7 +101,7 @@ extern "C" {
         Describe enumeration elements and structure and union members above each 
         element or member.
      */
-    
+
 
     // *****************************************************************************
     // *****************************************************************************
@@ -158,8 +157,6 @@ extern "C" {
             return 3;
         }
      */
-    
-    void DataProcessorTask(void);
 
 
     /* Provide C++ Compatibility */
@@ -167,7 +164,7 @@ extern "C" {
 }
 #endif
 
-#endif /* _DATA_PROCESSOR_H */
+#endif /* _DATA_MODIFIER_H_ */
 
 /* *****************************************************************************
  End of File

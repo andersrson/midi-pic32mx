@@ -21,7 +21,7 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-#include "midi.h"
+#include "ZwMidi.h"
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -37,7 +37,7 @@
 // *****************************************************************************
 
 
-const struct MidiString_t MidiStringsStatus[MIDI_STRINGS_MAX_STATUS_TYPES] = {
+const struct ZwMidiString MidiStringsChannel[MIDI_STRINGS_MAX_CHANNEL_TYPES] = {
     { 
         .ShortName = "nOff",
         .FullName = "Note Off"
@@ -72,10 +72,10 @@ const struct MidiString_t MidiStringsStatus[MIDI_STRINGS_MAX_STATUS_TYPES] = {
     },
 };
 
-const struct MidiString_t MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
+const struct ZwMidiString MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
     { 
-        .ShortName = "SysE",
-        .FullName = "System Exclusive"
+        .ShortName = "SOEX",
+        .FullName = "Start of SysEx"
     },
     { 
         .ShortName = "TmCd",
@@ -102,7 +102,7 @@ const struct MidiString_t MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
         .FullName = "Tuning request"
     },
     { 
-        .ShortName = "EOFX",
+        .ShortName = "EOEX",
         .FullName = "End Of SysEx"
     },
     { 

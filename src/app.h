@@ -31,10 +31,16 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+
 #include "configuration.h"
 
-#include "SyncedPinReader.h"
-#include "DataProcessor.h"
+#include "definitions.h"
+
+#include "ZwPinReader.h"
+#include "ZwDataProcessor.h"
+#include "DataFilter.h"
+#include "DataModifier.h"
+#include "OutputProcessor.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -127,7 +133,6 @@ typedef struct {
     /* The application's current state */
     APP_STATES state;
     
-    
     DISPLAY_STATE display1State;
     struct HD44780Instance *lcd;
     char displayMessageBuffer[128];
@@ -146,7 +151,9 @@ typedef struct {
     
     READ_MIDI_STATE readMidi1State;
     
-    struct PinReader_t PinReader[configPINREADER_COUNT];
+    struct ZwPinReader PinReader[configPINREADER_COUNT];
+    
+    struct OutputPin_t OutputPin[configOUTPUT_COUNT];
 } APP_DATA;
 
 extern TaskHandle_t xAPP_Task;

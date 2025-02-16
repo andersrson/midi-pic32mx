@@ -79,7 +79,7 @@ static void lAPP_I2C_Task(void *pvParam) {
 
 static void lDataProcessor_Task(void *pvParam) {
     while(true) {
-        DataProcessorTask();
+        ZwDataProcessorTask();
     }
 }
 
@@ -111,21 +111,21 @@ void SYS_Tasks ( void )
         /* Create OS Thread for APP_Tasks. */
     (void) xTaskCreate((TaskFunction_t) lAPP_Task,
                 "APP_Task",
-                1024,
+                configTASK_STACK_SIZE,
                 NULL,
                 1,
                 &xAPP_Task);
 
     (void) xTaskCreate((TaskFunction_t) lAPP_I2C_Task,
             "I2C_Task",
-            1024,
+            configTASK_STACK_SIZE,
             NULL,
             1,
             &xI2C_Task);
 
     (void) xTaskCreate((TaskFunction_t) lDataProcessor_Task,
             "PinReaderTask",
-            1024,
+            configTASK_STACK_SIZE,
             NULL,
             5,
             &xDataProcessor_Task);

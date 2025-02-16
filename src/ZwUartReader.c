@@ -2,15 +2,16 @@
 /** Descriptive File Name
 
   @Company
-    Anders Runesson
+    Company Name
 
   @File Name
-    SyncedPinReader.c
+    filename.c
 
   @Summary
-    Reads MIDI bit stream, synced to start bit @ 31250bps
+    Brief description of the file.
 
   @Description
+    Describe the purpose of this file.
  */
 /* ************************************************************************** */
 
@@ -20,16 +21,11 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
- */
+#include "config/default/driver/driver.h"
+#include "config/default/driver/usart/drv_usart.h"
 
-/* TODO:  Include other files here if needed. */
-
-#include <assert.h>
-
-#include "config/default/definitions.h"
-
-#include "ZwPinReader.h"
+#include "app.h"
+#include "ZwUartReader.h"
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -37,9 +33,16 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/*  A brief description of a section can be given directly below the section
-    banner.
+/* 
+ * 
+
+#define configUSARTREADER_COUNT                   (2U)
+#define configUSARTREADER_BUFFER_SIZE             (256U)
+
  */
+
+
+uint8_t nextToInitialize = 0;
 
 /* ************************************************************************** */
 /** Descriptive Data Item Name
@@ -59,15 +62,15 @@
     Any additional remarks
  */
 
+
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
+
 
 /* ************************************************************************** */
 
@@ -116,20 +119,6 @@
  */
 
 
-void lPinReaderPinChanged(GPIO_PIN pin, uintptr_t context) {
-    GPIO_PinInterruptDisable(pin);
-    struct ZwPinReader *reader = (struct ZwPinReader*) context;
-        
-    if(GPIO_PinRead(pin) == 0) {
-        reader->ReaderState = PINREAD_DATA_BIT;
-        
-        reader->ReadBits = 0;
-        reader->ReadByte = 0;
-        reader->TimerStart();
-    } else {
-        GPIO_PinInterruptEnable(pin);
-    }
-}
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -137,90 +126,71 @@ void lPinReaderPinChanged(GPIO_PIN pin, uintptr_t context) {
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
+DRV_HANDLE ZwUartInitialize(SYS_MODULE_INDEX moduleIndex) {
+    if(nextToInitialize == configUSARTREADER_COUNT)
+        return 0;
+    
+    struct ZwUsartInput* input = &appData.UsartInputs[nextToInitialize++];
+    
+    DRV_HANDLE usartHandle = 0;
+    usartHandle = DRV_USART_Open(moduleIndex, DRV_IO_INTENT_READ);
+    
+    input->driver = usartHandle;
+    
+    DRV_USART_BufferEventHandlerSet(usartHandle, ZwUartReadCallback, (uintptr_t) input);
+    
+    DRV_USART_ReadBufferAdd(
+        usartHandle,
+        input->InputBuffer,
+        configUSARTREADER_BUFFER_SIZE,
+        &input->bufferHandle
+    );
+    
+    
+    if(input->bufferHandle == DRV_USART_BUFFER_HANDLE_INVALID)
+        input->State = ZW_USART_STATE_ERR_INIT;
+    
+    return usartHandle;
+}
 
+void ZwUartReadCallback(DRV_USART_BUFFER_EVENT event, DRV_USART_BUFFER_HANDLE bufferHandle, uintptr_t context) {
+
+    struct ZwUsartInput* input = (struct ZwUsartInput*)context;
+    
+    switch(event) {
+        case DRV_USART_BUFFER_EVENT_COMPLETE: 
+            break;
+        case DRV_USART_BUFFER_EVENT_ERROR:
+            input->State = ZW_USART_STATE_ERR; 
+            input->Error = DRV_USART_ErrorGet(input->bufferHandle);
+            break;
+        case DRV_USART_BUFFER_EVENT_PENDING:
+            break;
+        case DRV_USART_BUFFER_EVENT_HANDLE_EXPIRED:
+            input->State = ZW_USART_STATE_ERR_HANDLE_EXPIRED; 
+            input->Error = DRV_USART_ErrorGet(input->bufferHandle);
+            break;
+        case DRV_USART_BUFFER_EVENT_HANDLE_INVALID:
+            input->State = ZW_USART_STATE_ERR_HANDLE_INVALID; 
+            input->Error = DRV_USART_ErrorGet(input->bufferHandle);
+            break;
+    }
+    
+}
 // *****************************************************************************
 
-static volatile uint32_t lPinsState;
+/** 
+  @Function
+    int ExampleInterfaceFunctionName ( int param1, int param2 ) 
 
-void ZwPinReaderOnInput(uint32_t status, uintptr_t context) {
-    
-    struct ZwPinReader *reader = (struct ZwPinReader*) context;
-    
-    __conditional_software_breakpoint(reader != NULL);
-    
-    reader->PortIn = GPIO_PinRead(reader->Pin);
-    
-    switch(reader->ReaderState) {
-        case PINREAD_NEVER_READ: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_IDLE: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_START_BIT: {
-            // Should never happen
-            __conditional_software_breakpoint(false);
-            break;
-        } case PINREAD_DATA_BIT: {
-            
-            reader->ReadByte += reader->PortIn << (reader->ReadBits++);
-            if(reader->ReadBits == 8)
-                reader->ReaderState = PINREAD_STOP_BIT;
-            break;
-        } case PINREAD_STOP_BIT: {
-            
-            __conditional_software_breakpoint(reader->NextBufferIndex < configPINREADER_BUFFER_SIZE);
-            
-            reader->Buffer[reader->NextBufferIndex++] = reader->ReadByte;
+  @Summary
+    Brief one-line description of the function.
 
-            if(reader->NextBufferIndex == configPINREADER_BUFFER_SIZE)
-                reader->NextBufferIndex = 0;
-            
-            reader->ReaderState = PINREAD_IDLE;
-            reader->ConsecutiveIdleTicks = 0;
-            
-            reader->TimerStop();
-            
-            GPIO_PinInterruptEnable(reader->Pin);
-            
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xTaskNotifyFromISR(
-                xDataProcessor_Task, 
-                reader->FlagId,
-                eSetBits,    
-                &xHigherPriorityTaskWoken);
-            
-            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-            break;
-        }
-    }
-}
+  @Remarks
+    Refer to the example_file.h interface header for function usage details.
+ */
 
-void ZwPinReaderInitialize(uint32_t status, uintptr_t context) {
-    
-    struct ZwPinReader *reader = (struct ZwPinReader*) context;
-    
-    reader->ReaderState = PINREAD_NEVER_READ;
-    
-    if(GPIO_PinRead(reader->Pin) == 0) {
-        reader->ConsecutiveIdleTicks = 0;
-        return;  
-    } 
-    
-    reader->ConsecutiveIdleTicks++;
-    if(reader->ConsecutiveIdleTicks > 3) {
-        reader->TimerStop();
-        
-        reader->TimerCallbackRegister(&ZwPinReaderOnInput, context);
-        GPIO_PinInterruptCallbackRegister(reader->Pin, &lPinReaderPinChanged, context);
-        GPIO_PinInterruptEnable(reader->Pin);
-    }
-}
+
 
 /* *****************************************************************************
  End of File

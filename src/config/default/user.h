@@ -37,6 +37,10 @@ extern "C" {
 
 #define configPINREADER_COUNT                   (2U)
 #define configPINREADER_BUFFER_SIZE             (256U)
+
+#define configUSARTREADER_COUNT                   (2U)
+#define configUSARTREADER_BUFFER_SIZE             (256U)
+    
 #define configOUTPUT_COUNT                      (4U)
 #define configOUTPUT_BUFFER_SIZE                (128U)
 

@@ -31,6 +31,7 @@
 
 #include "app.h"
 #include "HD44780.h"
+#include "ZwUartReader.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -142,6 +143,11 @@ void APP_Initialize ( void ) {
 
     TMR3_CallbackRegister(&ZwPinReaderInitialize, up_reader);
 
+    TMR2_Start();
+    TMR3_Start();
+    
+    ZwUartInitialize(DRV_USART_INDEX_0);
+    ZwUartInitialize(DRV_USART_INDEX_1);
 }
 
 void updateTaskStackSizeStats(TaskHandle_t task) {
@@ -319,7 +325,7 @@ void APP_I2C_Task(void) {
             GPIO_RA0_Clear();
             
             if(DRV_I2C_Status(sysObj.drvI2C0) == SYS_STATUS_READY) {
-                appData.i2cHandle = DRV_I2C_Open(sysObj.drvI2C0, DRV_IO_INTENT_EXCLUSIVE);
+                appData.i2cHandle = DRV_I2C_Open(DRV_I2C_INDEX_0, DRV_IO_INTENT_EXCLUSIVE);
                 if(appData.i2cHandle == DRV_HANDLE_INVALID) {
                     appData.display1State = DISPLAY_STATE_INIT_ERR;
                     break;

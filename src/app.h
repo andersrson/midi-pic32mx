@@ -42,6 +42,7 @@
 #include "DataFilter.h"
 #include "DataModifier.h"
 #include "OutputProcessor.h"
+#include "ZwUartReader.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -68,28 +69,28 @@ extern "C" {
     determine the behavior of the application at various times.
 */
 
-typedef enum {
+enum APP_STATES {
     /* Application's state machine's initial state. */
     APP_STATE_INIT=0,
     APP_STATE_SERVICE_TASKS,
     /* TODO: Define states used by the application state machine. */
 
-} APP_STATES;
+} ;
 
-typedef enum {
+enum DISPLAY_STATE {
     DISPLAY_STATE_INIT = 0,
     DISPLAY_STATE_INIT_ERR,
     DISPLAY_STATE_WRITE,
     DISPLAY_STATE_WRITE_ERR,
     DISPLAY_STATE_READY,
-} DISPLAY_STATE;
+};
 
-typedef enum {
+enum READ_MIDI_STATE {
     READ_MIDI_STATE_INIT = 0,
     READ_MIDI_STATE_INIT_ERR,
     READ_MIDI_STATE_READY,
     READ_MIDI_STATE_READING,
-} READ_MIDI_STATE;
+};
 
 // *****************************************************************************
 /* Application Data
@@ -132,9 +133,9 @@ struct UserData{
 
 typedef struct {
     /* The application's current state */
-    APP_STATES state;
+    enum APP_STATES state;
     
-    DISPLAY_STATE display1State;
+    enum DISPLAY_STATE display1State;
     struct HD44780Instance *lcd;
     char displayMessageBuffer[128];
     
@@ -150,12 +151,16 @@ typedef struct {
     
     struct UserData userData;
     
-    READ_MIDI_STATE readMidi1State;
+    enum READ_MIDI_STATE readMidi1State;
     
     struct ZwPinReader PinReader[configPINREADER_COUNT];
     
+    struct ZwUsartInput UsartInputs[configUSARTREADER_COUNT];
+    
     struct OutputPin_t OutputPin[configOUTPUT_COUNT];
 } APP_DATA;
+
+extern APP_DATA appData;
 
 extern TaskHandle_t xAPP_Task;
 extern TaskHandle_t xI2C_Task;

@@ -55,6 +55,13 @@
 
 APP_DATA appData;
 
+TickType_t timer500 = (500 / portTICK_PERIOD_MS);
+TickType_t timer100 = (100 / portTICK_PERIOD_MS);
+TickType_t timer50 = (50 / portTICK_PERIOD_MS);
+TickType_t timer10 = (10 / portTICK_PERIOD_MS);
+TickType_t timer5 = (5 / portTICK_PERIOD_MS);
+TickType_t timer1 = (1 / portTICK_PERIOD_MS);
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Functions

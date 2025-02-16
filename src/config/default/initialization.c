@@ -164,13 +164,6 @@ static const DRV_I2C_INIT drvI2C0InitData =
 /* Structure to hold the object handles for the modules in the system. */
 SYSTEM_OBJECTS sysObj;
 
-TickType_t timer500 = (500 / portTICK_PERIOD_MS);
-TickType_t timer100 = (100 / portTICK_PERIOD_MS);
-TickType_t timer50 = (50 / portTICK_PERIOD_MS);
-TickType_t timer10 = (10 / portTICK_PERIOD_MS);
-TickType_t timer5 = (5 / portTICK_PERIOD_MS);
-TickType_t timer1 = (1 / portTICK_PERIOD_MS);
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Library/Stack Initialization Data
@@ -239,9 +232,6 @@ void SYS_Initialize ( void* data ) {
 
     /* Initialize I2C0 Driver Instance */
     sysObj.drvI2C0 = DRV_I2C_Initialize(DRV_I2C_INDEX_0, (SYS_MODULE_INIT *)&drvI2C0InitData);
-
-
-    sysObj.i2cHandle = DRV_HANDLE_INVALID;
 
 
     /* MISRAC 2012 deviation block end */

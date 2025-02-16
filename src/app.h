@@ -160,6 +160,13 @@ extern TaskHandle_t xAPP_Task;
 extern TaskHandle_t xI2C_Task;
 extern TaskHandle_t xDataProcessor_Task;
 
+extern TickType_t timer500;
+extern TickType_t timer100;
+extern TickType_t timer50;
+extern TickType_t timer10;
+extern TickType_t timer5;
+extern TickType_t timer1;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Routines

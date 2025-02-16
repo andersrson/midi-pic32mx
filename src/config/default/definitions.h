@@ -199,9 +199,7 @@ typedef struct
 {
     /* I2C0 Driver Object */
     SYS_MODULE_OBJ drvI2C0;
-    DRV_HANDLE i2cHandle;
-
-
+    
 } SYSTEM_OBJECTS;
 
 // *****************************************************************************
@@ -213,13 +211,6 @@ typedef struct
 
 
 extern SYSTEM_OBJECTS sysObj;
-
-extern TickType_t timer500;
-extern TickType_t timer100;
-extern TickType_t timer50;
-extern TickType_t timer10;
-extern TickType_t timer5;
-extern TickType_t timer1;
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

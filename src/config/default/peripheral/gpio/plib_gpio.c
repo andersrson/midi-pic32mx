@@ -46,10 +46,10 @@
 
 
 /* Array to store callback objects of each configured interrupt */
-volatile static GPIO_PIN_CALLBACK_OBJ portPinCbObj[4];
+volatile static GPIO_PIN_CALLBACK_OBJ portPinCbObj[2];
 
 /* Array to store number of interrupts in each PORT Channel + previous interrupt count */
-volatile static uint8_t portNumCb[2 + 1] = { 0, 0, 4, };
+volatile static uint8_t portNumCb[2 + 1] = { 0, 0, 2, };
 
 /******************************************************************************
   Function:
@@ -70,16 +70,18 @@ void GPIO_Initialize ( void )
 
     /* PORTB Initialization */
     LATB = 0x0; /* Initial Latch Value */
-    TRISBCLR = 0xe01c; /* Direction Control */
+    TRISBCLR = 0xc01c; /* Direction Control */
     ANSELBCLR = 0xe00c; /* Digital Mode Enable */
     /* Change Notice Enable */
     CNCONBSET = _CNCONB_ON_MASK;
-
+    PORTB;
     IEC1SET = _IEC1_CNBIE_MASK;
 
 
 
     /* PPS Input Remapping */
+    U2RXR = 3;
+    U1RXR = 3;
 
     /* PPS Output Remapping */
 
@@ -90,11 +92,7 @@ void GPIO_Initialize ( void )
     
     portPinCbObj[0 + 1].pin = GPIO_PIN_RB7;
     
-    portPinCbObj[0 + 2].pin = GPIO_PIN_RB10;
-    
-    portPinCbObj[0 + 3].pin = GPIO_PIN_RB11;
-    
-    for(i=0; i<4; i++)
+    for(i=0; i<2; i++)
     {
         portPinCbObj[i].callback = NULL;
     }
@@ -341,7 +339,7 @@ static void __attribute__((used)) CHANGE_NOTICE_B_InterruptHandler(void)
     IFS1CLR = _IFS1_CNBIF_MASK;
 
     /* Check pending events and call callback if registered */
-    for(i = 0; i < 4; i++)
+    for(i = 0; i < 2; i++)
     {
         pin = portPinCbObj[i].pin;
         context = portPinCbObj[i].context;

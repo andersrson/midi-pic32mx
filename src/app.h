@@ -36,6 +36,7 @@
 
 #include "definitions.h"
 
+#include "ZwMidi.h"
 #include "ZwPinReader.h"
 #include "ZwDataProcessor.h"
 #include "DataFilter.h"

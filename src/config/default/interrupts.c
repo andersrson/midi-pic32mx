@@ -71,8 +71,10 @@ void TIMER_2_Handler (void);
 void TIMER_3_Handler (void);
 void TIMER_4_Handler (void);
 void TIMER_5_Handler (void);
+void UART_1_Handler (void);
 void I2C_1_Handler (void);
 void CHANGE_NOTICE_Handler (void);
+void UART_2_Handler (void);
 
 
 // *****************************************************************************
@@ -102,6 +104,11 @@ void TIMER_5_Handler (void)
     TIMER_5_InterruptHandler();
 }
 
+void UART_1_Handler (void)
+{
+    UART_1_InterruptHandler();
+}
+
 void I2C_1_Handler (void)
 {
     I2C_1_InterruptHandler();
@@ -110,6 +117,11 @@ void I2C_1_Handler (void)
 void CHANGE_NOTICE_Handler (void)
 {
     CHANGE_NOTICE_InterruptHandler();
+}
+
+void UART_2_Handler (void)
+{
+    UART_2_InterruptHandler();
 }
 
 

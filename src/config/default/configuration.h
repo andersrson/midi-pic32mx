@@ -91,19 +91,23 @@ extern "C" {
 #define DRV_I2C_CLIENTS_NUMBER_IDX0           2
 #define DRV_I2C_CLOCK_SPEED_IDX0              50000
 
+/* USART Driver Instance 1 Configuration Options */
+#define DRV_USART_INDEX_1                  1
+#define DRV_USART_CLIENTS_NUMBER_IDX1      1
+#define DRV_USART_QUEUE_SIZE_IDX1          5
+
 /* I2C Driver Common Configuration Options */
 #define DRV_I2C_INSTANCES_NUMBER              (1U)
 
-#define configHD44780_NUM_DISPLAYS              (1U)
 
-#define configPINREADER_COUNT                   (2U)
-#define configPINREADER_BUFFER_SIZE             (256U)
-#define configOUTPUT_COUNT                      (4U)
-#define configOUTPUT_BUFFER_SIZE                (128U)
+/* USART Driver Instance 0 Configuration Options */
+#define DRV_USART_INDEX_0                  0
+#define DRV_USART_CLIENTS_NUMBER_IDX0      1
+#define DRV_USART_QUEUE_SIZE_IDX0          5
 
-#define configTASK_STACK_SIZE                   (1024)
-    
-#define configMAX_USER_PROJECTS                 (2U)
+/* USART Driver Global Configuration Options */
+#define DRV_USART_INSTANCES_NUMBER         2
+
 
 // *****************************************************************************
 // *****************************************************************************

@@ -82,7 +82,8 @@
     function of the 'configuration bits' to configure the system oscillators.
 */
 
-void CLK_Initialize( void ) {
+void CLK_Initialize( void )
+{
 
     /* Code for fuse settings can be found in "initialization.c" */
 
@@ -104,15 +105,16 @@ void CLK_Initialize( void ) {
     SYSKEY = 0x33333333U;
 
     /* Wait for PLL to be locked */
-    while(OSCCONbits.SLOCK == 0U) {
-        /* Nothing to do */
-    }
+    while(OSCCONbits.SLOCK == 0U)
+                 {
+                      /* Nothing to do */
+                 }
 
     /* Peripheral Module Disable Configuration */
     PMD1 = 0x1101U;
     PMD2 = 0x7U;
     PMD3 = 0x1f001fU;
     PMD4 = 0x0U;
-    PMD5 = 0x1020303U;
+    PMD5 = 0x1020300U;
     PMD6 = 0x10003U;
 }

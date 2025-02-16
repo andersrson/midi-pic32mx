@@ -69,7 +69,7 @@
 #pragma config FSOSCEN =    OFF
 #pragma config IESO =       OFF
 #pragma config POSCMOD =    XT
-#pragma config OSCIOFNC =   OFF
+#pragma config OSCIOFNC =   ON
 #pragma config FCKSM =      CSDCMD
 #pragma config WDTPS =      PS1048576
 #pragma config FWDTEN =     OFF
@@ -153,6 +153,142 @@ static const DRV_I2C_INIT drvI2C0InitData =
 };
 // </editor-fold>
 
+// <editor-fold defaultstate="collapsed" desc="DRV_USART Instance 1 Initialization Data">
+
+static DRV_USART_CLIENT_OBJ drvUSART1ClientObjPool[DRV_USART_CLIENTS_NUMBER_IDX1];
+
+/* USART transmit/receive transfer objects pool */
+static DRV_USART_BUFFER_OBJ drvUSART1BufferObjPool[DRV_USART_QUEUE_SIZE_IDX1];
+
+static const DRV_USART_PLIB_INTERFACE drvUsart1PlibAPI = {
+    .readCallbackRegister = (DRV_USART_PLIB_READ_CALLBACK_REG)UART2_ReadCallbackRegister,
+    .read_t = (DRV_USART_PLIB_READ)UART2_Read,
+    .readIsBusy = (DRV_USART_PLIB_READ_IS_BUSY)UART2_ReadIsBusy,
+    .readCountGet = (DRV_USART_PLIB_READ_COUNT_GET)UART2_ReadCountGet,
+    .readAbort = (DRV_USART_PLIB_READ_ABORT)UART2_ReadAbort,
+    .writeCallbackRegister = (DRV_USART_PLIB_WRITE_CALLBACK_REG)UART2_WriteCallbackRegister,
+    .write_t = (DRV_USART_PLIB_WRITE)UART2_Write,
+    .writeIsBusy = (DRV_USART_PLIB_WRITE_IS_BUSY)UART2_WriteIsBusy,
+    .writeCountGet = (DRV_USART_PLIB_WRITE_COUNT_GET)UART2_WriteCountGet,
+    .errorGet = (DRV_USART_PLIB_ERROR_GET)UART2_ErrorGet,
+    .serialSetup = (DRV_USART_PLIB_SERIAL_SETUP)UART2_SerialSetup
+};
+
+static const uint32_t drvUsart1remapDataWidth[] = { 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0x0, 0x6 };
+static const uint32_t drvUsart1remapParity[] = { 0x0, 0x2, 0x4, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU };
+static const uint32_t drvUsart1remapStopBits[] = { 0x0, 0xFFFFFFFFU, 0x1 };
+static const uint32_t drvUsart1remapError[] = { 0x2, 0x8, 0x4 };
+
+static const DRV_USART_INTERRUPT_SOURCES drvUSART1InterruptSources =
+{
+    /* Peripheral has more than one interrupt vector */
+    .isSingleIntSrc                        = false,
+
+    /* Peripheral interrupt lines */
+    .intSources.multi.usartTxCompleteInt   = (int32_t)_UART2_TX_IRQ,
+    .intSources.multi.usartTxReadyInt      = -1,
+    .intSources.multi.usartRxCompleteInt   = (int32_t)_UART2_RX_IRQ,
+    .intSources.multi.usartErrorInt        = (int32_t)_UART2_ERR_IRQ,
+};
+
+static const DRV_USART_INIT drvUsart1InitData =
+{
+    .usartPlib = &drvUsart1PlibAPI,
+
+    /* USART Number of clients */
+    .numClients = DRV_USART_CLIENTS_NUMBER_IDX1,
+
+    /* USART Client Objects Pool */
+    .clientObjPool = (uintptr_t)&drvUSART1ClientObjPool[0],
+
+    /* Combined size of transmit and receive buffer objects */
+    .bufferObjPoolSize = DRV_USART_QUEUE_SIZE_IDX1,
+
+    /* USART transmit and receive buffer buffer objects pool */
+    .bufferObjPool = (uintptr_t)&drvUSART1BufferObjPool[0],
+
+    .interruptSources = &drvUSART1InterruptSources,
+
+    .remapDataWidth = drvUsart1remapDataWidth,
+
+    .remapParity = drvUsart1remapParity,
+
+    .remapStopBits = drvUsart1remapStopBits,
+
+    .remapError = drvUsart1remapError,
+
+    .dataWidth = DRV_USART_DATA_8_BIT,
+};
+
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="DRV_USART Instance 0 Initialization Data">
+
+static DRV_USART_CLIENT_OBJ drvUSART0ClientObjPool[DRV_USART_CLIENTS_NUMBER_IDX0];
+
+/* USART transmit/receive transfer objects pool */
+static DRV_USART_BUFFER_OBJ drvUSART0BufferObjPool[DRV_USART_QUEUE_SIZE_IDX0];
+
+static const DRV_USART_PLIB_INTERFACE drvUsart0PlibAPI = {
+    .readCallbackRegister = (DRV_USART_PLIB_READ_CALLBACK_REG)UART1_ReadCallbackRegister,
+    .read_t = (DRV_USART_PLIB_READ)UART1_Read,
+    .readIsBusy = (DRV_USART_PLIB_READ_IS_BUSY)UART1_ReadIsBusy,
+    .readCountGet = (DRV_USART_PLIB_READ_COUNT_GET)UART1_ReadCountGet,
+    .readAbort = (DRV_USART_PLIB_READ_ABORT)UART1_ReadAbort,
+    .writeCallbackRegister = (DRV_USART_PLIB_WRITE_CALLBACK_REG)UART1_WriteCallbackRegister,
+    .write_t = (DRV_USART_PLIB_WRITE)UART1_Write,
+    .writeIsBusy = (DRV_USART_PLIB_WRITE_IS_BUSY)UART1_WriteIsBusy,
+    .writeCountGet = (DRV_USART_PLIB_WRITE_COUNT_GET)UART1_WriteCountGet,
+    .errorGet = (DRV_USART_PLIB_ERROR_GET)UART1_ErrorGet,
+    .serialSetup = (DRV_USART_PLIB_SERIAL_SETUP)UART1_SerialSetup
+};
+
+static const uint32_t drvUsart0remapDataWidth[] = { 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0x0, 0x6 };
+static const uint32_t drvUsart0remapParity[] = { 0x0, 0x2, 0x4, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU };
+static const uint32_t drvUsart0remapStopBits[] = { 0x0, 0xFFFFFFFFU, 0x1 };
+static const uint32_t drvUsart0remapError[] = { 0x2, 0x8, 0x4 };
+
+static const DRV_USART_INTERRUPT_SOURCES drvUSART0InterruptSources =
+{
+    /* Peripheral has more than one interrupt vector */
+    .isSingleIntSrc                        = false,
+
+    /* Peripheral interrupt lines */
+    .intSources.multi.usartTxCompleteInt   = (int32_t)_UART1_TX_IRQ,
+    .intSources.multi.usartTxReadyInt      = -1,
+    .intSources.multi.usartRxCompleteInt   = (int32_t)_UART1_RX_IRQ,
+    .intSources.multi.usartErrorInt        = (int32_t)_UART1_ERR_IRQ,
+};
+
+static const DRV_USART_INIT drvUsart0InitData =
+{
+    .usartPlib = &drvUsart0PlibAPI,
+
+    /* USART Number of clients */
+    .numClients = DRV_USART_CLIENTS_NUMBER_IDX0,
+
+    /* USART Client Objects Pool */
+    .clientObjPool = (uintptr_t)&drvUSART0ClientObjPool[0],
+
+    /* Combined size of transmit and receive buffer objects */
+    .bufferObjPoolSize = DRV_USART_QUEUE_SIZE_IDX0,
+
+    /* USART transmit and receive buffer buffer objects pool */
+    .bufferObjPool = (uintptr_t)&drvUSART0BufferObjPool[0],
+
+    .interruptSources = &drvUSART0InterruptSources,
+
+    .remapDataWidth = drvUsart0remapDataWidth,
+
+    .remapParity = drvUsart0remapParity,
+
+    .remapStopBits = drvUsart0remapStopBits,
+
+    .remapError = drvUsart0remapError,
+
+    .dataWidth = DRV_USART_DATA_8_BIT,
+};
+
+// </editor-fold>
 
 
 
@@ -197,7 +333,8 @@ SYSTEM_OBJECTS sysObj;
   Remarks:
  */
 
-void SYS_Initialize ( void* data ) {
+void SYS_Initialize ( void* data )
+{
 
     /* MISRAC 2012 deviation block start */
     /* MISRA C-2012 Rule 2.2 deviated in this file.  Deviation record ID -  H3_MISRAC_2012_R_2_2_DR_1 */
@@ -214,17 +351,28 @@ void SYS_Initialize ( void* data ) {
     /* Set the SRAM wait states to One */
     BMXCONbits.BMXWSDRM = 1;
 
-    GPIO_Initialize();
+
+
+
+	GPIO_Initialize();
 
     I2C1_Initialize();
-    
-    TMR2_Initialize();
-    TMR3_Initialize();
     TMR4_Initialize();
+
+	UART1_Initialize();
+
     TMR5_Initialize();
 
-    //TMR1_Initialize();
-    
+	UART2_Initialize();
+
+    TMR2_Initialize();
+
+    TMR3_Initialize();
+
+    TMR1_Initialize();
+
+
+
     /* MISRAC 2012 deviation block start */
     /* Following MISRA-C rules deviated in this block  */
     /* MISRA C-2012 Rule 11.3 - Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
@@ -232,6 +380,12 @@ void SYS_Initialize ( void* data ) {
 
     /* Initialize I2C0 Driver Instance */
     sysObj.drvI2C0 = DRV_I2C_Initialize(DRV_I2C_INDEX_0, (SYS_MODULE_INIT *)&drvI2C0InitData);
+
+    sysObj.drvUsart1 = DRV_USART_Initialize(DRV_USART_INDEX_1, (SYS_MODULE_INIT *)&drvUsart1InitData);
+
+    sysObj.drvUsart0 = DRV_USART_Initialize(DRV_USART_INDEX_0, (SYS_MODULE_INIT *)&drvUsart0InitData);
+
+
 
 
     /* MISRAC 2012 deviation block end */
@@ -243,8 +397,7 @@ void SYS_Initialize ( void* data ) {
 	/* Enable global interrupts */
     (void)__builtin_enable_interrupts();
 
-    TMR2_Start();
-    TMR3_Start();            
+
 
     /* MISRAC 2012 deviation block end */
 }

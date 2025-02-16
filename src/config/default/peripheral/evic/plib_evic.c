@@ -60,8 +60,10 @@ void EVIC_Initialize( void )
     IPC3SET = 0x4U | 0x0U;  /* TIMER_3:  Priority 1 / Subpriority 0 */
     IPC4SET = 0x4U | 0x0U;  /* TIMER_4:  Priority 1 / Subpriority 0 */
     IPC5SET = 0x4U | 0x0U;  /* TIMER_5:  Priority 1 / Subpriority 0 */
+    IPC8SET = 0x8U | 0x0U;  /* UART_1:  Priority 2 / Subpriority 0 */
     IPC8SET = 0xc00U | 0x0U;  /* I2C_1:  Priority 3 / Subpriority 0 */
     IPC8SET = 0x40000U | 0x0U;  /* CHANGE_NOTICE:  Priority 1 / Subpriority 0 */
+    IPC9SET = 0x800U | 0x0U;  /* UART_2:  Priority 2 / Subpriority 0 */
 
 
 }

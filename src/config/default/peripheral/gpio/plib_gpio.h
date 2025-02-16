@@ -164,28 +164,6 @@
 #define GPIO_RB10_InputEnable()       (TRISBSET = (1<<10))
 #define GPIO_RB10_Get()               ((PORTB >> 10) & 0x1)
 #define GPIO_RB10_PIN                  GPIO_PIN_RB10
-#define GPIO_RB10_InterruptEnable()   (CNENBSET = (1<<10))
-#define GPIO_RB10_InterruptDisable()  (CNENBCLR = (1<<10))
-
-/*** Macros for GPIO_RB11 pin ***/
-#define GPIO_RB11_Set()               (LATBSET = (1<<11))
-#define GPIO_RB11_Clear()             (LATBCLR = (1<<11))
-#define GPIO_RB11_Toggle()            (LATBINV= (1<<11))
-#define GPIO_RB11_OutputEnable()      (TRISBCLR = (1<<11))
-#define GPIO_RB11_InputEnable()       (TRISBSET = (1<<11))
-#define GPIO_RB11_Get()               ((PORTB >> 11) & 0x1)
-#define GPIO_RB11_PIN                  GPIO_PIN_RB11
-#define GPIO_RB11_InterruptEnable()   (CNENBSET = (1<<11))
-#define GPIO_RB11_InterruptDisable()  (CNENBCLR = (1<<11))
-
-/*** Macros for GPIO_RB13 pin ***/
-#define GPIO_RB13_Set()               (LATBSET = (1<<13))
-#define GPIO_RB13_Clear()             (LATBCLR = (1<<13))
-#define GPIO_RB13_Toggle()            (LATBINV= (1<<13))
-#define GPIO_RB13_OutputEnable()      (TRISBCLR = (1<<13))
-#define GPIO_RB13_InputEnable()       (TRISBSET = (1<<13))
-#define GPIO_RB13_Get()               ((PORTB >> 13) & 0x1)
-#define GPIO_RB13_PIN                  GPIO_PIN_RB13
 
 /*** Macros for GPIO_RB14 pin ***/
 #define GPIO_RB14_Set()               (LATBSET = (1<<14))

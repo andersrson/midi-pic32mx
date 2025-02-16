@@ -176,6 +176,37 @@ _TIMER_5_Handler:
     nop
     portRESTORE_CONTEXT
     .end    _TIMER_5_Handler
+   .extern  UART_1_Handler
+
+   .section .vector_32,code, keep
+   .equ     __vector_dispatch_32, IntVectorUART_1_Handler
+   .global  __vector_dispatch_32
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorUART_1_Handler
+
+IntVectorUART_1_Handler:
+    la    $26,  _UART_1_Handler
+    jr    $26
+    nop
+    .end    IntVectorUART_1_Handler
+
+   .section .UART_1_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _UART_1_Handler
+
+_UART_1_Handler:
+    portSAVE_CONTEXT
+    la    s6,  UART_1_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _UART_1_Handler
    .extern  I2C_1_Handler
 
    .section .vector_33,code, keep
@@ -238,4 +269,35 @@ _CHANGE_NOTICE_Handler:
     nop
     portRESTORE_CONTEXT
     .end    _CHANGE_NOTICE_Handler
+   .extern  UART_2_Handler
+
+   .section .vector_37,code, keep
+   .equ     __vector_dispatch_37, IntVectorUART_2_Handler
+   .global  __vector_dispatch_37
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorUART_2_Handler
+
+IntVectorUART_2_Handler:
+    la    $26,  _UART_2_Handler
+    jr    $26
+    nop
+    .end    IntVectorUART_2_Handler
+
+   .section .UART_2_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _UART_2_Handler
+
+_UART_2_Handler:
+    portSAVE_CONTEXT
+    la    s6,  UART_2_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _UART_2_Handler
 

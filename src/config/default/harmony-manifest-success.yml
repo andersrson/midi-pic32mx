@@ -4,18 +4,18 @@
 
 
 project: MIDI1
-creation_date: 2024-05-26T19:49:26.392+02:00[Europe/Stockholm]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
+creation_date: 2025-02-16T14:54:45.203+01:00[Europe/Stockholm]    # ISO 8601 format: https://www.w3.org/TR/NOTE-datetime
 operating_system: Mac OS X
 mcc_mode: IDE            # [IDE|Standalone|Headless]
 mcc_version: v5.5.1
 mcc_core_version: v5.7.1
 mplabx_version: v6.20        # if MPLAB X plugin only
 harmony_version: v1.5.2
-compiler: XC32 4.30
+compiler: XC32 4.50
 
 modules:
-    - {name: "csp", version: "v3.17.0"}
     - {name: "core", version: "v3.13.1"}
+    - {name: "csp", version: "v3.17.0"}
     - {name: "CMSIS-FreeRTOS", version: "v10.5.1"}
 
 packs:

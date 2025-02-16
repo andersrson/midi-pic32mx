@@ -48,26 +48,27 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <assert.h>
-
-#include "peripheral/i2c/master/plib_i2c1_master.h"
-#include "peripheral/tmr/plib_tmr4.h"
-#include "peripheral/tmr/plib_tmr5.h"
-#include "peripheral/tmr/plib_tmr2.h"
-#include "peripheral/tmr/plib_tmr3.h"
 #include "peripheral/clk/plib_clk.h"
 #include "peripheral/gpio/plib_gpio.h"
 #include "peripheral/evic/plib_evic.h"
+#include "driver/i2c/drv_i2c.h"
+#include "peripheral/i2c/master/plib_i2c1_master.h"
+#include "peripheral/tmr/plib_tmr4.h"
+#include "peripheral/uart/plib_uart1.h"
+#include "peripheral/tmr/plib_tmr5.h"
+#include "peripheral/uart/plib_uart2.h"
+#include "peripheral/tmr/plib_tmr2.h"
+#include "driver/usart/drv_usart.h"
+#include "peripheral/tmr/plib_tmr3.h"
 #include "peripheral/tmr1/plib_tmr1.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "driver/i2c/drv_i2c.h"
 #include "system/int/sys_int.h"
 #include "system/dma/sys_dma.h"
 #include "osal/osal.h"
 #include "system/debug/sys_debug.h"
 #include "app.h"
-#include "ZwMidi.h"
+
 
 
 // DOM-IGNORE-BEGIN
@@ -199,7 +200,10 @@ typedef struct
 {
     /* I2C0 Driver Object */
     SYS_MODULE_OBJ drvI2C0;
-    
+
+    SYS_MODULE_OBJ  drvUsart1;
+    SYS_MODULE_OBJ  drvUsart0;
+
 } SYSTEM_OBJECTS;
 
 // *****************************************************************************

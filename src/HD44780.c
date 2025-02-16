@@ -21,9 +21,6 @@
 
 #include "HD44780.h"
 
-const static TickType_t delay50ms = (50 / portTICK_PERIOD_MS);
-const static TickType_t delay5ms = (10 / portTICK_PERIOD_MS);
-
 struct HD44780Config {
     uint8_t Lines;
     bool IsInterlaced;
@@ -128,24 +125,24 @@ bool HD44780GoTo(struct HD44780Instance* instance, uint8_t line, uint8_t col) {
 bool HD44780Initialize(struct HD44780Instance* instance) {
     
     // Must wait 40 ms after reaching 2.7V
-    vTaskDelay(delay50ms);
+    vTaskDelay(timer50);
     
     if(LocalHD44780SendCommand(instance, HD44780_CMD_HOME) == false)
         return false;
     
     // Wait min 4.1ms
-    vTaskDelay(delay5ms);
+    vTaskDelay(timer5);
     
     if(LocalHD44780SendCommand(instance, HD44780_CMD_HOME) == false)
         return false;
     
     // Wait min 100us
-    vTaskDelay(delay5ms);    
+    vTaskDelay(timer1);    
     
     if(LocalHD44780SendCommand(instance, HD44780_CMD_HOME) == false)
         return false;
     
-    vTaskDelay(delay5ms);    
+    vTaskDelay(timer5);    
     
     // No more waiting
     if(LocalHD44780SendCommand(instance, HD44780_CMD_FUNCTION | HD44780_FUNCTION_4BIT | HD44780_FUNCTION_2LINE | HD44780_FUNCTION_8DOT) == false)
@@ -166,7 +163,7 @@ bool HD44780Initialize(struct HD44780Instance* instance) {
     if(LocalHD44780SendCommand(instance, HD44780_CMD_HOME) == false)
         return false;
     
-    vTaskDelay(delay5ms);
+    vTaskDelay(timer5);
     
     
     return true;

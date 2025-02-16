@@ -29,8 +29,6 @@ extern "C" {
 #error "You must define the constant configHD44780_NUM_DISPLAYS"
 #endif
     
-typedef uint8_t HD44780_Handle;
-    
 struct HD44780Config;
 
 #define HD44780_ENTRY_SHIFT_OFF     0x00

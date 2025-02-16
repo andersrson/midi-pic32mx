@@ -63,7 +63,7 @@
 /* Handle for the APP_Tasks. */
 TaskHandle_t xAPP_Task;
 TaskHandle_t xI2C_Task;
-TaskHandle_t xPinReader_Task;
+TaskHandle_t xDataProcessor_Task;
 
 static void lAPP_Task(  void *pvParameters  ) {
     while(true) {
@@ -77,9 +77,9 @@ static void lAPP_I2C_Task(void *pvParam) {
     }
 }
 
-static void lAPP_PinReader_Task(void *pvParam) {
+static void lDataProcessor_Task(void *pvParam) {
     while(true) {
-        APP_PinReaderTask();
+        ZwDataProcessorTask();
     }
 }
 
@@ -111,24 +111,24 @@ void SYS_Tasks ( void )
         /* Create OS Thread for APP_Tasks. */
     (void) xTaskCreate((TaskFunction_t) lAPP_Task,
                 "APP_Task",
-                1024,
+                configTASK_STACK_SIZE,
                 NULL,
                 1,
                 &xAPP_Task);
 
     (void) xTaskCreate((TaskFunction_t) lAPP_I2C_Task,
             "I2C_Task",
-            1024,
+            configTASK_STACK_SIZE,
             NULL,
             1,
             &xI2C_Task);
 
-    (void) xTaskCreate((TaskFunction_t) lAPP_PinReader_Task,
+    (void) xTaskCreate((TaskFunction_t) lDataProcessor_Task,
             "PinReaderTask",
-            512,
+            configTASK_STACK_SIZE,
             NULL,
             5,
-            &xPinReader_Task);
+            &xDataProcessor_Task);
 
     /* Start RTOS Scheduler. */
     

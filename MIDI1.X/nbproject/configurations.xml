@@ -105,10 +105,13 @@
         </logicalFolder>
       </logicalFolder>
       <itemPath>../src/app.h</itemPath>
-      <itemPath>i2c_pcf8574_display.h</itemPath>
       <itemPath>../src/HD44780.h</itemPath>
-      <itemPath>../src/midi.h</itemPath>
-      <itemPath>../src/SyncedPinReader.h</itemPath>
+      <itemPath>../src/DataFilter.h</itemPath>
+      <itemPath>../src/DataModifier.h</itemPath>
+      <itemPath>../src/OutputProcessor.h</itemPath>
+      <itemPath>../src/ZwPinReader.h</itemPath>
+      <itemPath>../src/ZwMidi.h</itemPath>
+      <itemPath>../src/ZwDataProcessor.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -207,8 +210,12 @@
       <itemPath>../src/main.c</itemPath>
       <itemPath>../src/app.c</itemPath>
       <itemPath>../src/HD44780.c</itemPath>
-      <itemPath>../src/midi.c</itemPath>
-      <itemPath>../src/SyncedPinReader.c</itemPath>
+      <itemPath>../src/DataFilter.c</itemPath>
+      <itemPath>../src/DataModifier.c</itemPath>
+      <itemPath>../src/OutputProcessor.c</itemPath>
+      <itemPath>../src/ZwPinReader.c</itemPath>
+      <itemPath>../src/ZwMidi.c</itemPath>
+      <itemPath>../src/ZwDataProcessor.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -224,7 +231,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>pk4hybrid</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>4.30</languageToolchainVersion>
+        <languageToolchainVersion>4.50</languageToolchainVersion>
         <platform>4</platform>
       </toolsSet>
       <packs>
@@ -260,7 +267,6 @@
       <C32>
         <property key="additional-warnings" value="true"/>
         <property key="addresss-attribute-use" value="false"/>
-        <property key="appendMe" value=""/>
         <property key="enable-app-io" value="false"/>
         <property key="enable-omit-frame-pointer" value="false"/>
         <property key="enable-symbols" value="true"/>
@@ -290,7 +296,6 @@
         <property key="additional-options-chop-files" value="false"/>
       </C32-AR>
       <C32-AS>
-        <property key="appendMe" value=""/>
         <property key="assembler-symbols" value=""/>
         <property key="enable-symbols" value="true"/>
         <property key="exclude-floating-point-library" value="false"/>
@@ -320,7 +325,6 @@
         <property key="additional-options-use-response-files" value="false"/>
         <property key="additional-options-write-sla" value="false"/>
         <property key="allocate-dinit" value="false"/>
-        <property key="appendMe" value=""/>
         <property key="code-dinit" value="false"/>
         <property key="ebase-addr" value=""/>
         <property key="enable-check-sections" value="false"/>
@@ -360,7 +364,6 @@
       <C32CPP>
         <property key="additional-warnings" value="false"/>
         <property key="addresss-attribute-use" value="false"/>
-        <property key="appendMe" value=""/>
         <property key="check-new" value="false"/>
         <property key="eh-specs" value="true"/>
         <property key="enable-app-io" value="false"/>
@@ -568,8 +571,6 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d01ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="/Users/anders/Documents/MPLABXProjects/MIDI1/MIDI1.X/debug/default/MIDI1_ptg"/>
         <property key="programmerToGoImageName" value="MIDI1_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

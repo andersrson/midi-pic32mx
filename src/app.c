@@ -29,8 +29,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "definitions.h"
-
 #include "app.h"
 #include "HD44780.h"
 
@@ -99,48 +97,60 @@ void APP_Initialize ( void ) {
     
     appData.lastReadStackSize = 0;
     appData.largestTaskStackSize = 0;
+    appData.availableHeapBytes = 0;
+    appData.lastReadAvailableHeapBytes = 0;
+    
+    // TODO Test settings
+    appData.userData.lastUsedProject = 0;
+    appData.userData.currentProject = &appData.userData.projects[appData.userData.lastUsedProject];
+    appData.userData.currentProject->displayFilterMidiTime = true;
+    appData.userData.currentProject->displayFilterMidiNoteOff = true;
+    
+    struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
+    uintptr_t up_reader = 0;
+
+    reader->Pin = GPIO_PIN_RB5;
+    reader->FlagId = 0x01;
+    
+    reader->ConsecutiveIdleTicks = 0;
+    reader->TimerStart = &TMR2_Start;
+    reader->TimerStop = &TMR2_Stop;
+    reader->TimerCallbackRegister = &TMR2_CallbackRegister;
+
+    up_reader = (uintptr_t) reader;
+
+    TMR2_CallbackRegister(&ZwPinReaderInitialize, up_reader);
+
+    reader = (struct ZwPinReader*) &appData.PinReader[1];
+    
+    reader->Pin = GPIO_PIN_RB7;
+    reader->FlagId = 0x02;
+    
+    reader->ConsecutiveIdleTicks = 0;
+    reader->TimerStart = &TMR3_Start;
+    reader->TimerStop = &TMR3_Stop;
+    reader->TimerCallbackRegister = &TMR3_CallbackRegister;
+
+    up_reader = (uintptr_t) reader;
+
+    TMR3_CallbackRegister(&ZwPinReaderInitialize, up_reader);
+
 }
 
 void updateTaskStackSizeStats(TaskHandle_t task) {
-    uint32_t size = uxTaskGetStackHighWaterMark(task);
+    
+    // uxTaskGetStackHighWaterMark() returns the smallest amount of free stack 
+    // space available since the task was started. 
+    uint32_t size = configTASK_STACK_SIZE - uxTaskGetStackHighWaterMark(task);
+    
     if(size > appData.largestTaskStackSize) {
         appData.largestTaskStackSize = size;
         appData.taskName = pcTaskGetName(task);
     }
-}
-
-void APP_PinReaderTask(void) {
-    switch(appData.readMidi1State) {
-        case READ_MIDI_STATE_INIT: {
-            
-            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
-            reader->Pin = GPIO_PIN_RB5;
-            reader->ConsecutiveIdleTicks = 0;
-            reader->TimerStart = &TMR2_Start;
-            reader->TimerStop = &TMR2_Stop;
-            reader->TimerCallbackRegister = &TMR2_CallbackRegister;
     
-            uintptr_t pr0 = (uintptr_t) reader;
-            
-            TMR2_CallbackRegister(&PinReaderInitialize, pr0);
-            TMR2_Start();
-            
-            appData.readMidi1State = READ_MIDI_STATE_READY;
-            break;
-        } case READ_MIDI_STATE_INIT_ERR: {
-            
-            break;
-        } case READ_MIDI_STATE_READY: {
-            
-            vTaskDelay(timer500);
-            break;
-        } case READ_MIDI_STATE_READING: {
-            
-            break;
-        }
-    }
-    
-    updateTaskStackSizeStats(xPinReader_Task);
+    uint32_t heap = xPortGetFreeHeapSize();
+    if(heap > appData.availableHeapBytes)
+        appData.availableHeapBytes = heap;
 }
 
 /******************************************************************************
@@ -173,8 +183,6 @@ void APP_Task ( void ) {
         case APP_STATE_SERVICE_TASKS: {
             vTaskDelay(timer500);
             
-            //GPIO_RA1_Toggle();
-            
             break;
         }
 
@@ -198,12 +206,102 @@ bool i2cCheckError(bool input) {
     if(input == false) {
         appData.i2cErr = DRV_I2C_ErrorGet(appData.i2cHandle);
         if(appData.i2cErr == DRV_I2C_ERROR_NACK) {
-            GPIO_RB3_Set();
+            // TODO: Error handling
         } else if (appData.i2cErr == DRV_I2C_ERROR_BUS) {
-            GPIO_RB2_Set();
+            // TODO: Error handling
         } 
     }
     return appData.i2cErr == DRV_I2C_ERROR_NONE && input == true;
+}
+
+
+void printMidi(struct ZwPinReader *reader, uint8_t lcdLine, uint8_t lcdCol) {
+
+    __conditional_software_breakpoint(reader != NULL);
+
+    if(reader->ReaderState == PINREAD_NEVER_READ)
+        return;
+    
+    while(reader->ReaderState != PINREAD_IDLE) {
+        vTaskDelay(timer1);
+    }
+
+    uint16_t lastByteIndex = 0;
+    uint16_t lastByteSafety = 0; 
+    uint8_t byte0 = 0;
+    //uint8_t byte0_value = 0;        // Lower nibble of first byte
+    uint8_t byte1 = 0;
+    uint8_t byte2 = 0;
+    const char* byte0Str;
+    char byte1Str[4] = "   ";
+    
+    PINREAD_LAST_WRITTEN(lastByteIndex, reader);
+    lastByteSafety = lastByteIndex;
+    
+    __conditional_software_breakpoint(lastByteIndex < configPINREADER_BUFFER_SIZE);
+
+    while(!MIDI_IS_STATUS_BYTE(byte0)) {
+        PINREAD_PREV_BYTE(lastByteIndex);
+        
+        // If we've looped we did not find a status byte
+        if(lastByteIndex == lastByteSafety)
+            return;
+        
+        __conditional_software_breakpoint(lastByteIndex < configPINREADER_BUFFER_SIZE);
+        byte0 = reader->Buffer[lastByteIndex];
+    }
+    //byte0_value = byte0 & MIDI_STATUS_LOWER_NIBBLE_MASK;
+    
+    if(MIDI_IS_SYSTEM(byte0)) {
+        
+        // Filter MIDI time code messages from flooding display
+        if(MIDI_GET_STATUS_VALUE(byte0) == MIDI_SYSTEM_COMMON_TIME_CODE || MIDI_GET_STATUS_VALUE(byte0) == MIDI_SYSTEM_REALTIME_TIME_CLK) {
+            if(appData.userData.currentProject->displayFilterMidiTime)
+                return;
+        }
+        MIDI_GET_SYSTEM_STRING_SHORT(byte0, byte0Str);
+
+        if(MIDI_IS_SYSTEM_SONG_SEL(byte0)) {
+            PINREAD_NEXT_BYTE(lastByteIndex);
+            byte1 = reader->Buffer[lastByteIndex];
+
+            snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
+        } else if(MIDI_IS_SYSTEM_SONG_POS(byte0)) {
+            PINREAD_NEXT_BYTE(lastByteIndex);
+            byte1 = reader->Buffer[lastByteIndex];
+            PINREAD_NEXT_BYTE(lastByteIndex);
+            byte2 = reader->Buffer[lastByteIndex];
+
+            snprintf(appData.displayMessageBuffer, 21, "[%s] [%x] [%x]", byte0Str, byte1, byte2);
+        } else 
+            snprintf(appData.displayMessageBuffer, 21, "[%s]     ", byte0Str);
+    } else if(MIDI_IS_STATUS_BYTE(byte0)) {
+        if(MIDI_IS_NOTE_OFF(byte0)) {
+            if(appData.userData.currentProject->displayFilterMidiNoteOff)
+                return;
+        }
+        
+        MIDI_GET_CHANNEL_SHORT_STRING(byte0, byte0Str);
+        PINREAD_NEXT_BYTE(lastByteIndex);
+        byte1 = reader->Buffer[lastByteIndex];
+
+        if(MIDI_IS_NOTE(byte0)) {
+            MIDI_GET_NOTE_STRING(byte1, byte1Str);
+            snprintf(appData.displayMessageBuffer, 21, "[%s] [%s]   ", byte0Str, byte1Str);
+        } else 
+            snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]   ", byte0Str, byte1);
+
+    } else {
+        PINREAD_NEXT_BYTE(lastByteIndex);
+        byte1 = reader->Buffer[lastByteIndex];
+        PINREAD_NEXT_BYTE(lastByteIndex);
+        byte2 = reader->Buffer[lastByteIndex];
+        snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", byte0, byte1, byte2);
+    }
+
+    i2cCheckError(HD44780GoTo(appData.lcd, lcdLine, lcdCol));
+    i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
+            
 }
 
 void APP_I2C_Task(void) {
@@ -273,73 +371,26 @@ void APP_I2C_Task(void) {
             break;
         } case DISPLAY_STATE_READY: {
             
-            if(appData.largestTaskStackSize > appData.lastReadStackSize) {        
-                snprintf(appData.displayMessageBuffer, 21, "%s %d", appData.taskName, appData.largestTaskStackSize);
+            if(     appData.largestTaskStackSize > appData.lastReadStackSize ||
+                    appData.availableHeapBytes > appData.lastReadAvailableHeapBytes) {        
                 
-                i2cCheckError(HD44780GoTo(appData.lcd, 2, 0));
+                snprintf(appData.displayMessageBuffer, 21, "%s %d %d", 
+                        appData.taskName, 
+                        appData.largestTaskStackSize,
+                        appData.availableHeapBytes);
+                
+                i2cCheckError(HD44780GoTo(appData.lcd, 0, 0));
                 i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            struct PinReader_t *reader = (struct PinReader_t*) &appData.PinReader[0];
+            struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
+            printMidi(reader, 2, 0);
+            reader = (struct ZwPinReader*) &appData.PinReader[1];
+            printMidi(reader, 3, 0);
             
-            if(reader->ReaderState != PINREAD_IDLE)
-                break;
-            
-            uint16_t lastByte = 0;
-            PINREAD_LAST_WRITTEN(lastByte, reader);
-            uint8_t byte0 = reader->Buffer[lastByte];
-            uint8_t byte1 = 0;
-            uint8_t byte2 = 0;
-            while(!MIDI_IS_STATUS_BYTE(byte0)) {
-                PINREAD_PREV_BYTE(lastByte);
-                byte0 = reader->Buffer[lastByte];
-            }
-            
-            const char* byte0Str;
-            char byte1Str[4] = "   ";
-            
-            if(MIDI_IS_SYSEX(byte0)) {
-                MIDI_GET_SYSEX_STRING_SHORT(byte0, byte0Str);
-                
-                if(MIDI_IS_SYSEX_SONG_SEL(byte0)) {
-                    PINREAD_NEXT_BYTE(lastByte);
-                    byte1 = reader->Buffer[lastByte];
-            
-                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
-                } else if(MIDI_IS_SYSEX_SONG_POS(byte0)) {
-                    PINREAD_NEXT_BYTE(lastByte);
-                    byte1 = reader->Buffer[lastByte];
-                    PINREAD_NEXT_BYTE(lastByte);
-                    byte2 = reader->Buffer[lastByte];
-
-                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x] [%x]", byte0Str, byte1, byte2);
-                } else 
-                    snprintf(appData.displayMessageBuffer, 21, "[%s]            ", byte0Str);
-            } else if(MIDI_IS_STATUS_BYTE(byte0)) {
-                MIDI_GET_STATUS_SHORT_STRING(byte0, byte0Str);
-                PINREAD_NEXT_BYTE(lastByte);
-                byte1 = reader->Buffer[lastByte];
-                    
-                if(MIDI_IS_NOTE(byte0)) {
-                    MIDI_GET_NOTE_STRING(byte1, byte1Str);
-                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%s]       ", byte0Str, byte1Str);
-                } else 
-                    snprintf(appData.displayMessageBuffer, 21, "[%s] [%x]       ", byte0Str, byte1);
-                
-            } else {
-                PINREAD_NEXT_BYTE(lastByte);
-                byte1 = reader->Buffer[lastByte];
-                PINREAD_NEXT_BYTE(lastByte);
-                byte2 = reader->Buffer[lastByte];
-                snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", byte0, byte1, byte2);
-            }
-            
-            i2cCheckError(HD44780GoTo(appData.lcd, 3, 0));
-            i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
-
             GPIO_RA0_Toggle();
-            vTaskDelay(timer100);
+            vTaskDelay(timer10);
             
             break;
         }

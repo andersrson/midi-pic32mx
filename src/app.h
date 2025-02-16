@@ -31,9 +31,16 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+
 #include "configuration.h"
 
-#include "SyncedPinReader.h"
+#include "definitions.h"
+
+#include "ZwPinReader.h"
+#include "ZwDataProcessor.h"
+#include "DataFilter.h"
+#include "DataModifier.h"
+#include "OutputProcessor.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -96,30 +103,62 @@ typedef enum {
     Application strings and buffers are be defined outside this structure.
  */
 
+
+struct MidiTransform {
+    
+};
+
+struct MidiFilter {
+    
+};
+
+struct Project {
+    bool displayFilterMidiTime;
+    bool displayFilterMidiNoteOff;
+};
+        
+struct DeviceConfig {
+    
+    
+};
+
+struct UserData{
+    struct DeviceConfig devConfig;
+    struct Project *currentProject;
+    struct Project projects[configMAX_USER_PROJECTS];
+    uint16_t lastUsedProject;
+};
+
 typedef struct {
     /* The application's current state */
     APP_STATES state;
     
-    
     DISPLAY_STATE display1State;
     struct HD44780Instance *lcd;
-    char displayMessageBuffer[21];
+    char displayMessageBuffer[128];
     
     DRV_HANDLE i2cHandle;
     DRV_I2C_ERROR i2cErr;
+    
     uint32_t lastReadStackSize;
+    uint32_t largestTaskStackSize;
+    char *taskName;
+    
+    uint32_t lastReadAvailableHeapBytes;
+    uint32_t availableHeapBytes;
+    
+    struct UserData userData;
     
     READ_MIDI_STATE readMidi1State;
     
-    struct PinReader_t PinReader[configPINREADER_COUNT];
+    struct ZwPinReader PinReader[configPINREADER_COUNT];
     
-    uint32_t largestTaskStackSize;
-    char *taskName;
+    struct OutputPin_t OutputPin[configOUTPUT_COUNT];
 } APP_DATA;
 
 extern TaskHandle_t xAPP_Task;
 extern TaskHandle_t xI2C_Task;
-extern TaskHandle_t xPinReader_Task;
+extern TaskHandle_t xDataProcessor_Task;
 
 // *****************************************************************************
 // *****************************************************************************

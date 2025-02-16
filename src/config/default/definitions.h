@@ -48,6 +48,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <assert.h>
+
 #include "peripheral/i2c/master/plib_i2c1_master.h"
 #include "peripheral/tmr/plib_tmr4.h"
 #include "peripheral/tmr/plib_tmr5.h"
@@ -65,7 +67,7 @@
 #include "osal/osal.h"
 #include "system/debug/sys_debug.h"
 #include "app.h"
-#include "midi.h"
+#include "ZwMidi.h"
 
 
 // DOM-IGNORE-BEGIN

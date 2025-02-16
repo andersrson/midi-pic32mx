@@ -94,12 +94,17 @@ extern "C" {
 /* I2C Driver Common Configuration Options */
 #define DRV_I2C_INSTANCES_NUMBER              (1U)
 
+#define configHD44780_NUM_DISPLAYS              (1U)
 
-#define configHD44780_NUM_DISPLAYS              1
+#define configPINREADER_COUNT                   (2U)
+#define configPINREADER_BUFFER_SIZE             (256U)
+#define configOUTPUT_COUNT                      (4U)
+#define configOUTPUT_BUFFER_SIZE                (128U)
 
-#define configPINREADER_COUNT                   4
-#define configPINREADER_BUFFER_SIZE             256
+#define configTASK_STACK_SIZE                   (1024)
     
+#define configMAX_USER_PROJECTS                 (2U)
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Middleware & Other Library Configuration

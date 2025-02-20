@@ -83,16 +83,24 @@ extern "C" {
 
 enum ZW_USART_STATE {
     ZW_USART_STATE_INIT = 0,
+    ZW_USART_STATE_READY,
     ZW_USART_STATE_ERR_INIT,
     ZW_USART_STATE_READING,
+    ZW_USART_STATE_READ_COMPLETE,
     ZW_USART_STATE_ERR,
     ZW_USART_STATE_ERR_HANDLE_INVALID,
     ZW_USART_STATE_ERR_HANDLE_EXPIRED,
 };
 
 struct ZwUsartInput {
+    
+    uint8_t FlagId; 
+    
     DRV_HANDLE driver;
     uint8_t InputBuffer[configUSARTREADER_BUFFER_SIZE];
+    uint8_t NextIndex;
+    uint8_t NextUnread;
+    
     DRV_USART_BUFFER_HANDLE bufferHandle;
     enum ZW_USART_STATE State;
     DRV_USART_ERROR Error;
@@ -127,7 +135,9 @@ struct ZwUsartInput {
     // *****************************************************************************
     // *****************************************************************************
 
-DRV_HANDLE ZwUartInitialize(SYS_MODULE_INDEX moduleIndex);
+struct ZwUsartInput* ZwUartInitialize(struct ZwUsartInput* input, SYS_MODULE_INDEX moduleIndex, uint8_t flagId);
+
+uint8_t ZwUartReaderGetNextUnread(uintptr_t reader);
 
 void ZwUartReadCallback(DRV_USART_BUFFER_EVENT event, DRV_USART_BUFFER_HANDLE bufferHandle, uintptr_t context);
 //void ZwUartReadCallback(uintptr_t context);

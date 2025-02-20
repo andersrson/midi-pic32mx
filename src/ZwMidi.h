@@ -23,6 +23,9 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
+#include <stdint.h>
+#include <stddef.h>
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +53,7 @@ extern "C" {
 #define MIDI_STATUS_UPPER_NIBBLE_MASK           0xF0
 #define MIDI_STATUS_LOWER_NIBBLE_MASK           0x0F
     
-#define MIDI_STRINGS_MAX_CHANNEL_TYPES           8
+#define MIDI_STRINGS_MAX_CHANNEL_TYPES           7
 #define MIDI_STRINGS_MAX_SYSTEM_TYPES           16
 #define MIDI_STRINGS_MAX_NOTES                  12
 
@@ -67,25 +70,42 @@ extern "C" {
 #define MIDI_SYSTEM_REALTIME_FLAG               0x08
 #define MIDI_SYSTEM_REALTIME_MASK               0xF8
     
+// Definitions below need to be OR'ed with 
+// MIDI_STATUS_SYSTEM to form a proper Status byte 
 #define MIDI_SYSTEM_EX_SOE                      0x00
-    
+#define MIDI_SYSTEM_EX_SOE_MASK                 (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_EX_SOE)
 #define MIDI_SYSTEM_COMMON_TIME_CODE            0x01
+#define MIDI_SYSTEM_COMMON_TIME_CODE_MASK       (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_TIME_CODE)
 #define MIDI_SYSTEM_COMMON_SONG_POS             0x02
+#define MIDI_SYSTEM_COMMON_SONG_POS_MASK        (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_POS)
 #define MIDI_SYSTEM_COMMON_SONG_SEL             0x03
+#define MIDI_SYSTEM_COMMON_SONG_SEL_MASK        (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_SEL)
 #define MIDI_SYSTEM_COMMON_UNDEF1               0x04
+#define MIDI_SYSTEM_COMMON_UNDEF1_MASK          (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_UNDEF1)
 #define MIDI_SYSTEM_COMMON_UNDEF2               0x05
+#define MIDI_SYSTEM_COMMON_UNDEF2_MASK          (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_UNDEF2)
 #define MIDI_SYSTEM_COMMON_TUNE                 0x06
+#define MIDI_SYSTEM_COMMON_TUNE_MASK            (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_TUNE)
     
 #define MIDI_SYSTEM_EX_EOE                      0x07
+#define MIDI_SYSTEM_EX_EOE_MASK                 (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_EX_EOE)
     
 #define MIDI_SYSTEM_REALTIME_TIME_CLK           0x08
+#define MIDI_SYSTEM_REALTIME_TIME_CLK_MASK      (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_TIME_CLK)
 #define MIDI_SYSTEM_REALTIME_UNDEF3             0x09
+#define MIDI_SYSTEM_REALTIME_UNDEF3_MASK        (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_UNDEF3)
 #define MIDI_SYSTEM_REALTIME_START              0x0A
+#define MIDI_SYSTEM_REALTIME_START_MASK         (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_START)
 #define MIDI_SYSTEM_REALTIME_CONTINUE           0x0B
+#define MIDI_SYSTEM_REALTIME_CONTINUE_MASK      (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_CONTINUE)
 #define MIDI_SYSTEM_REALTIME_STOP               0x0C
+#define MIDI_SYSTEM_REALTIME_STOP_MASK          (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_STOP)
 #define MIDI_SYSTEM_REALTIME_UNDEF4             0x0D
+#define MIDI_SYSTEM_REALTIME_UNDEF4_MASK        (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_UNDEF4)
 #define MIDI_SYSTEM_REALTIME_ACT_SENSE          0x0E
+#define MIDI_SYSTEM_REALTIME_ACT_SENSE_MASK     (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_ACT_SENSE)
 #define MIDI_SYSTEM_REALTIME_RESET              0x0F
+#define MIDI_SYSTEM_REALTIME_RESET_MASK         (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_REALTIME_RESET)
 
 /* ************************************************************************** */
 /** Descriptive Constant Name
@@ -135,15 +155,50 @@ extern "C" {
     element or member.
  */
 
+enum ZwMidiMessageClass {
+    ZwMidiMessageClassChannel,
+    ZwMidiMessageClassSysCommon,
+    ZwMidiMessageClassSysRealTime,
+    ZwMidiMessageClassSysEx
+};
 
-struct ZwMidiString {
+enum ZwMidiMessageType {
+    ZwMidiMessageTypeNoteOff,
+    ZwMidiMessageTypeNoteOn,
+    ZwMidiMessageTypePolyphonicPressure,
+    ZwMidiMessageTypeControlChange,
+    ZwMidiMessageTypeProgramChange,
+    ZwMidiMessageTypeChannelPressure,
+    ZwMidiMessageTypePitchBend,
+    ZwMidiMessageTypeSysExSOE,
+    ZwMidiMessageTypeTimeCode,
+    ZwMidiMessageTypeSongPosition,
+    ZwMidiMessageTypeSongSelect,
+    ZwMidiMessageTypeUndefined,
+    ZwMidiMessageTypeUndefined2,
+    ZwMidiMessageTypeTuneRequest,
+    ZwMidiMessageTypeSysExEOE,
+    ZwMidiMessageTypeTimingClock,
+    ZwMidiMessageTypeUndefined3,
+    ZwMidiMessageTypeStart,
+    ZwMidiMessageTypeContinue,
+    ZwMidiMessageTypeStop,
+    ZwMidiMessageTypeUndefined4,
+    ZwMidiMessageTypeActiveSense,
+    ZwMidiMessageTypeReset,
+};
+
+struct ZwMidiMessageData {
     char* ShortName;
     char* FullName;
+    enum ZwMidiMessageClass Class;
+    enum ZwMidiMessageType Type;
+    uint8_t MessageLength;
 };
 
 
-extern const struct ZwMidiString MidiStringsChannel[MIDI_STRINGS_MAX_CHANNEL_TYPES];
-extern const struct ZwMidiString MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES];
+extern const struct ZwMidiMessageData MidiMessageDefinitionsChannel[MIDI_STRINGS_MAX_CHANNEL_TYPES];
+extern const struct ZwMidiMessageData MidiMessageDefinitionsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES];
 extern const char* MidiNoteSharps[MIDI_STRINGS_MAX_NOTES];
 extern const char* MidiNoteFlats[MIDI_STRINGS_MAX_NOTES];
 extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
@@ -153,10 +208,6 @@ extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
 // Section: Interface Functions
 // *****************************************************************************
 // *****************************************************************************
-
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
 
 // *****************************************************************************
 /**
@@ -203,34 +254,39 @@ extern const char* MidiSysexTypes[MIDI_STRINGS_MAX_SYSTEM_TYPES];
     }
  */
 
+const struct ZwMidiMessageData* ZwMidiGetMessageData(uint8_t statusByte);
+
 //#define MIDI_IS_STATUS_BYTE(byte) ((byte & MIDI_STATUS_BYTE_FLAG) == MIDI_STATUS_BYTE_FLAG && !((byte & MIDI_STATUS_SYSTEM) == MIDI_STATUS_SYSTEM))
 
-#define MIDI_IS_STATUS_BYTE(byte) (byte >= 128)
+#define MIDI_IS_STATUS_BYTE(zw_midi_byte) (zw_midi_byte >= 128)
 
-#define MIDI_IS_CHANNEL(byte) (MIDI_IS_STATUS_BYTE(byte) && ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) < MIDI_STATUS_SYSTEM)
+#define MIDI_IS_CHANNEL(zw_midi_byte) (MIDI_IS_STATUS_BYTE(zw_midi_byte) && ((zw_midi_byte & MIDI_STATUS_UPPER_NIBBLE_MASK) < MIDI_STATUS_SYSTEM))
 
-#define MIDI_IS_NOTE_OFF(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_CHANNEL_NOTE_OFF)
-#define MIDI_IS_NOTE_ON(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_CHANNEL_NOTE_ON)
-#define MIDI_IS_NOTE(byte) (MIDI_IS_NOTE_ON(byte) || MIDI_IS_NOTE_OFF(byte))
+#define MIDI_IS_NOTE_OFF(zw_midi_byte) ((zw_midi_byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_CHANNEL_NOTE_OFF)
+#define MIDI_IS_NOTE_ON(zw_midi_byte) ((zw_midi_byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_CHANNEL_NOTE_ON)
+#define MIDI_IS_NOTE(zw_midi_byte) (MIDI_IS_NOTE_ON(zw_midi_byte) || MIDI_IS_NOTE_OFF(zw_midi_byte))
 
-#define MIDI_IS_SYSTEM(byte) ((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSTEM)
+#define MIDI_IS_SYSTEM(zw_midi_byte) ((zw_midi_byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSTEM)
 
-#define MIDI_IS_SYSTEM_COMMON(byte) (((byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSTEM) \
-        && ((byte & MIDI_SYSTEM_REALTIME_FLAG) > 0) && ((byte & MIDI_SYSTEM_REALTIME_FLAG) < MIDI_SYSTEM_EX_EOE))
+#define MIDI_IS_SYSTEM_COMMON(zw_midi_byte) (((zw_midi_byte & MIDI_STATUS_UPPER_NIBBLE_MASK) == MIDI_STATUS_SYSTEM) \
+        && ((zw_midi_byte & MIDI_SYSTEM_REALTIME_FLAG) > 0) && ((zw_midi_byte & MIDI_SYSTEM_REALTIME_FLAG) < MIDI_SYSTEM_EX_EOE))
 
-#define MIDI_IS_SYSTEM_SONG_POS(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_POS))
-#define MIDI_IS_SYSTEM_SONG_SEL(byte) (byte == (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_SEL))
+#define MIDI_IS_REALTIME(zw_midi_byte) ( (zw_midi_byte & MIDI_SYSTEM_REALTIME_MASK) == MIDI_SYSTEM_REALTIME_MASK)
+#define MIDI_IS_SYSEX(zw_midi_byte) ( ((zw_midi_byte & MIDI_SYSTEM_EX_SOE_MASK) == MIDI_SYSTEM_EX_SOE_MASK) || ((zw_midi_byte & MIDI_SYSTEM_EX_EOE_MASK) == MIDI_SYSTEM_EX_EOE_MASK) )
+
+#define MIDI_IS_SYSTEM_SONG_POS(zw_midi_byte) (zw_midi_byte == (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_POS))
+#define MIDI_IS_SYSTEM_SONG_SEL(zw_midi_byte) (zw_midi_byte == (MIDI_STATUS_SYSTEM | MIDI_SYSTEM_COMMON_SONG_SEL))
 
 #define MIDI_GET_STATUS_VALUE(byte) (byte & MIDI_STATUS_LOWER_NIBBLE_MASK)
     
 #define MIDI_GET_CHANNEL_SHORT_STRING(byte, str)                                 \
 do {                                                                            \
-    str = MidiStringsChannel[(byte & MIDI_STATUS_TYPE_MASK) >> 4].ShortName;     \
+    str = MidiMessageDefinitionsChannel[(byte & MIDI_STATUS_TYPE_MASK) >> 4].ShortName;     \
 } while (0)
 
 #define MIDI_GET_CHANNEL_FULL_STRING(byte, str)                                 \
 do {                                                                            \
-    str = MidiStringsChannel[(byte & MIDI_STATUS_TYPE_MASK) >> 4].FullName;     \
+    str = MidiMessageDefinitionsChannel[(byte & MIDI_STATUS_TYPE_MASK) >> 4].FullName;     \
 } while (0)
 
 #define MIDI_GET_NOTE_STRING(byte, str)                 \
@@ -243,15 +299,36 @@ do {                                                    \
 
 #define MIDI_GET_SYSTEM_STRING_SHORT(byte, str)                                  \
 do {                                                                            \
-    str = MidiStringsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].ShortName;   \
+    str = MidiMessageDefinitionsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].ShortName;   \
 } while (0)
 
 #define MIDI_GET_SYSTEM_STRING_FULL(byte, str)                                   \
 do {                                                                            \
-    str = MidiStringsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].FullName;   \
+    str = MidiMessageDefinitionsSystem[(byte & MIDI_STATUS_LOWER_NIBBLE_MASK)].FullName;   \
 } while (0)
 
+#define MIDI_GET_MSG_TYPE(zwmidi_byte, zwmidi_msg_type) \
+do { \
+    if(MIDI_IS_STATUS_BYTE(zwmidi_byte) && MIDI_IS_CHANNEL(zwmidi_byte)) { \
+        zwmidi_msg_type = &MidiMessageDefinitionsChannel[(zwmidi_byte & MIDI_STATUS_TYPE_MASK) >> 4]; \
+    } else { \
+        zwmidi_msg_type = &MidiMessageDefinitionsSystem[(zwmidi_byte & MIDI_STATUS_TYPE_MASK)];\
+    } \
+} while(0)
 
+/*
+const struct ZwMidiMessageData* GetMessageType(uint8_t byte) {
+    const struct ZwMidiMessageData* msg = NULL;
+    do { 
+        if(MIDI_IS_STATUS_BYTE(byte) && MIDI_IS_CHANNEL(byte)) { 
+            msg = &MidiMessageDefinitionsChannel[(byte & MIDI_STATUS_TYPE_MASK) >> 4]; 
+        } else { 
+            msg = &MidiMessageDefinitionsSystem[(byte & MIDI_STATUS_TYPE_MASK)];
+        } 
+    } while(0);
+    return msg;
+}
+ */
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

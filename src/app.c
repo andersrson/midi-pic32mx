@@ -78,7 +78,6 @@ TickType_t timer1 = (1 / portTICK_PERIOD_MS);
 // *****************************************************************************
 // *****************************************************************************
 
-
 /* TODO:  Add any necessary local functions.
 */
 
@@ -121,6 +120,7 @@ void APP_Initialize ( void ) {
     reader->FlagId = 0x01;
     
     reader->ConsecutiveIdleTicks = 0;
+    reader->NextUnreadIndex = 0;
     reader->TimerStart = &TMR2_Start;
     reader->TimerStop = &TMR2_Stop;
     reader->TimerCallbackRegister = &TMR2_CallbackRegister;
@@ -135,7 +135,8 @@ void APP_Initialize ( void ) {
     reader->FlagId = 0x02;
     
     reader->ConsecutiveIdleTicks = 0;
-    reader->TimerStart = &TMR3_Start;
+    reader->NextUnreadIndex = 0;
+    reader->TimerStart = &TMR3_Initialize;
     reader->TimerStop = &TMR3_Stop;
     reader->TimerCallbackRegister = &TMR3_CallbackRegister;
 
@@ -146,8 +147,16 @@ void APP_Initialize ( void ) {
     TMR2_Start();
     TMR3_Start();
     
-    ZwUartInitialize(DRV_USART_INDEX_0);
-    ZwUartInitialize(DRV_USART_INDEX_1);
+    ZwUartInitialize(&appData.UsartInputs[0], DRV_USART_INDEX_0, 0x04);
+    ZwUartInitialize(&appData.UsartInputs[1], DRV_USART_INDEX_1, 0x08);
+    
+    ZwMidiProcessorInitialize();
+    
+    ZwMidiProcessorRegisterReader(appData.PinReader[0].FlagId, (uintptr_t)&appData.PinReader[0], ZwPinReaderGetNextUnread);
+    ZwMidiProcessorRegisterReader(appData.PinReader[1].FlagId, (uintptr_t)&appData.PinReader[1], ZwPinReaderGetNextUnread);
+    ZwMidiProcessorRegisterReader(appData.UsartInputs[0].FlagId, (uintptr_t)&appData.UsartInputs[0], ZwUartReaderGetNextUnread);
+    ZwMidiProcessorRegisterReader(appData.UsartInputs[1].FlagId, (uintptr_t)&appData.UsartInputs[1], ZwUartReaderGetNextUnread);
+    
 }
 
 void updateTaskStackSizeStats(TaskHandle_t task) {
@@ -263,7 +272,6 @@ void printMidi(struct ZwPinReader *reader, uint8_t lcdLine, uint8_t lcdCol) {
         __conditional_software_breakpoint(lastByteIndex < configPINREADER_BUFFER_SIZE);
         byte0 = reader->Buffer[lastByteIndex];
     }
-    //byte0_value = byte0 & MIDI_STATUS_LOWER_NIBBLE_MASK;
     
     if(MIDI_IS_SYSTEM(byte0)) {
         
@@ -311,10 +319,9 @@ void printMidi(struct ZwPinReader *reader, uint8_t lcdLine, uint8_t lcdCol) {
         byte2 = reader->Buffer[lastByteIndex];
         snprintf(appData.displayMessageBuffer, 21, "[%x] [%x] [%x]   ", byte0, byte1, byte2);
     }
-
+    
     i2cCheckError(HD44780GoTo(appData.lcd, lcdLine, lcdCol));
     i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
-            
 }
 
 void APP_I2C_Task(void) {
@@ -397,10 +404,40 @@ void APP_I2C_Task(void) {
                 appData.lastReadStackSize = appData.largestTaskStackSize;
             }
             
-            struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
-            printMidi(reader, 2, 0);
-            reader = (struct ZwPinReader*) &appData.PinReader[1];
+            struct ZwMidiMessage* msg = ZwMidiNextUnreadMessage();
+            if(msg != NULL) {
+                __conditional_software_breakpoint(msg->MessageType != NULL);
+                __conditional_software_breakpoint(msg->MessageType->ShortName != NULL);
+                
+                msg->IsHandled = true;
+                snprintf(appData.displayMessageBuffer, 21, "%s              ", msg->MessageType->ShortName);
+                i2cCheckError(HD44780GoTo(appData.lcd, 2, 0));
+                i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));            
+            }
+            
+            //struct ZwUsartInput *uart1 = (struct ZwUsartInput*) &appData.UsartInputs[0];
+            //struct ZwUsartInput *uart2 = (struct ZwUsartInput*) &appData.UsartInputs[1];
+            
+            //snprintf(appData.displayMessageBuffer, 21, "%x %x %x %x %x %x", 
+            //        uart1->InputBuffer[0], uart1->InputBuffer[1], uart1->InputBuffer[2], uart1->InputBuffer[3], uart1->InputBuffer[4], uart1->InputBuffer[5]);
+            //i2cCheckError(HD44780GoTo(appData.lcd, 1, 0));
+            //i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
+            
+            //snprintf(appData.displayMessageBuffer, 21, "%x %x %x %x %x %x", 
+            //        uart2->InputBuffer[0], uart2->InputBuffer[1], uart2->InputBuffer[2], uart2->InputBuffer[3], uart2->InputBuffer[4], uart2->InputBuffer[5]);
+            // snprintf(appData.displayMessageBuffer, 21, "%x %x %x %x %x %x", 
+            //        uart1->InputBuffer[6], uart1->InputBuffer[7], uart1->InputBuffer[8], uart1->InputBuffer[9], uart1->InputBuffer[10], uart1->InputBuffer[11]);
+            
+            //i2cCheckError(HD44780GoTo(appData.lcd, 2, 0));
+            //i2cCheckError(HD44780PrintString(appData.lcd, appData.displayMessageBuffer));
+            
+            
+            //struct ZwPinReader *reader = (struct ZwPinReader*) &appData.PinReader[0];
+            //printMidi(reader, 2, 0);
+            
+            /*reader = (struct ZwPinReader*) &appData.PinReader[1];
             printMidi(reader, 3, 0);
+            */
             
             GPIO_RA0_Toggle();
             vTaskDelay(timer10);

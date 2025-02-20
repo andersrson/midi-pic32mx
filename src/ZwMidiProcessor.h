@@ -37,6 +37,9 @@ extern "C" {
     /* ************************************************************************** */
     /* ************************************************************************** */
 
+#define ZW_MIDI_DATA_BUFSIZE 4
+#define ZW_MIDI_SOURCE_MSG_QUEUE_SIZE 2
+    
     /*  A brief description of a section can be given directly below the section
         banner.
      */
@@ -68,17 +71,32 @@ extern "C" {
     // *****************************************************************************
     // *****************************************************************************
 
-    /*  A brief description of a section can be given directly below the section
-        banner.
-     */
+typedef uint8_t (*ZW_MIDI_PROCESSOR_DATA_CALLBACK)(uintptr_t reader);
 
-    struct ZwPinReadState {
-        
-    };
+struct ZwMidiMessage {
+    const struct ZwMidiMessageData* MessageType;
+    uint8_t MidiStatus;
+    uint8_t MidiData[ZW_MIDI_DATA_BUFSIZE];
+    uint8_t NextIndex;
     
-    struct ZwDataProcessor {
-        
-    };
+    bool IsHandled;
+    bool IsComplete;
+};
+
+struct ZwMidiSource {
+    uint8_t FlagId;
+    uintptr_t Source;
+    ZW_MIDI_PROCESSOR_DATA_CALLBACK GetLatestByte;
+            
+    bool IsSysexMode;
+    
+    struct ZwMidiMessage Queue[ZW_MIDI_SOURCE_MSG_QUEUE_SIZE];
+    uint8_t QueueNextIndex;
+    
+    struct ZwMidiMessage* IncomingMessage;
+    struct ZwMidiMessage* LatestMessage;
+};
+
 
     // *****************************************************************************
 
@@ -158,7 +176,13 @@ extern "C" {
         }
      */
     
-    void ZwDataProcessorTask(void);
+void ZwMidiProcessorInitialize();
+
+struct ZwMidiMessage* ZwMidiNextUnreadMessage();
+struct ZwMidiMessage* ZwMidiNextUnreadRealtimeMessage();
+
+void ZwMidiProcessorRegisterReader(uint8_t flagId, uintptr_t reader, ZW_MIDI_PROCESSOR_DATA_CALLBACK cb);
+void ZwMidiProcessorTask(void);
 
 
     /* Provide C++ Compatibility */

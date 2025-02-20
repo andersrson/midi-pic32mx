@@ -79,7 +79,7 @@ static void lAPP_I2C_Task(void *pvParam) {
 
 static void lDataProcessor_Task(void *pvParam) {
     while(true) {
-        ZwDataProcessorTask();
+        ZwMidiProcessorTask();
     }
 }
 

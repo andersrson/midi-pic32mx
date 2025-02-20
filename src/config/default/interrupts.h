@@ -65,6 +65,8 @@ void UART_1_InterruptHandler( void );
 void I2C_1_InterruptHandler( void );
 void CHANGE_NOTICE_InterruptHandler( void );
 void UART_2_InterruptHandler( void );
+void DMA_0_InterruptHandler( void );
+void DMA_1_InterruptHandler( void );
 
 
 

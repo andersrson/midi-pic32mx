@@ -38,7 +38,7 @@
 
 #include "ZwMidi.h"
 #include "ZwPinReader.h"
-#include "ZwDataProcessor.h"
+#include "ZwMidiProcessor.h"
 #include "DataFilter.h"
 #include "DataModifier.h"
 #include "OutputProcessor.h"

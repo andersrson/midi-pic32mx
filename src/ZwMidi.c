@@ -37,105 +37,169 @@
 // *****************************************************************************
 
 
-const struct ZwMidiString MidiStringsChannel[MIDI_STRINGS_MAX_CHANNEL_TYPES] = {
+const struct ZwMidiMessageData MidiMessageDefinitionsChannel[MIDI_STRINGS_MAX_CHANNEL_TYPES] = {
     { 
         .ShortName = "nOff",
-        .FullName = "Note Off"
+        .FullName = "Note Off",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypeNoteOff,
+        .MessageLength = 2
     },
     { 
         .ShortName = "nOn",
-        .FullName = "Note On"
+        .FullName = "Note On",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypeNoteOn,
+        .MessageLength = 2
     },
     { 
         .ShortName = "PAT",
-        .FullName = "Polyphonic Aftertouch"
+        .FullName = "Polyphonic Aftertouch",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypePolyphonicPressure,
+        .MessageLength = 2
     },
     { 
         .ShortName = "CC",
-        .FullName = "Control/Mode Change"
+        .FullName = "Control/Mode Change",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypeControlChange,
+        .MessageLength = 2
     },
     { 
         .ShortName = "PC",
-        .FullName = "Program Change"
+        .FullName = "Program Change",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypeProgramChange,
+        .MessageLength = 1
     },
     { 
         .ShortName = "ChAT",
-        .FullName = "Channel Aftertouch"
+        .FullName = "Channel Aftertouch",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypeChannelPressure,
+        .MessageLength = 1
     },
     { 
         .ShortName = "Bnd",
-        .FullName = "Pitch Bend"
-    },
-    { 
-        .ShortName = "Sys",
-        .FullName = "System Common"
-    },
+        .FullName = "Pitch Bend",
+        .Class = ZwMidiMessageClassChannel,
+        .Type = ZwMidiMessageTypePitchBend,
+        .MessageLength = 2
+    }
 };
 
-const struct ZwMidiString MidiStringsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
+const struct ZwMidiMessageData MidiMessageDefinitionsSystem[MIDI_STRINGS_MAX_SYSTEM_TYPES] = {
     { 
         .ShortName = "SOEX",
-        .FullName = "Start of SysEx"
+        .FullName = "Start of SysEx",
+        .Class = ZwMidiMessageClassSysEx,
+        .Type = ZwMidiMessageTypeSysExSOE,
+        .MessageLength = UINT8_MAX
     },
     { 
         .ShortName = "TmCd",
-        .FullName = "Midi Time Code"
+        .FullName = "Midi Time Code",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeTimeCode,
+        .MessageLength = 1
     },
     { 
         .ShortName = "SPos",
-        .FullName = "Song Position"
+        .FullName = "Song Position",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeSongPosition,
+        .MessageLength = 2
     },
     { 
         .ShortName = "SSel",
-        .FullName = "Song Select"
+        .FullName = "Song Select",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeSongSelect,
+        .MessageLength = 1
     },
     { 
         .ShortName = "UDef",
-        .FullName = "Undefined"
+        .FullName = "Undefined",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeUndefined,
+        .MessageLength = 0
     },
     { 
         .ShortName = "UDef",
-        .FullName = "Undefined"
+        .FullName = "Undefined",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeUndefined2,
+        .MessageLength = 0
     },
     { 
         .ShortName = "Tune",
-        .FullName = "Tuning request"
+        .FullName = "Tuning request",
+        .Class = ZwMidiMessageClassSysCommon,
+        .Type = ZwMidiMessageTypeTuneRequest,
+        .MessageLength = 0
     },
     { 
         .ShortName = "EOEX",
-        .FullName = "End Of SysEx"
+        .FullName = "End Of SysEx",
+        .Class = ZwMidiMessageClassSysEx,
+        .MessageLength = 0
     },
     { 
         .ShortName = "TmCk",
-        .FullName = "Timing Clock"
+        .FullName = "Timing Clock",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeSysExEOE,
+        .MessageLength = 0
     },
     { 
         .ShortName = "UDef",
-        .FullName = "Undefined"
+        .FullName = "Undefined",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeUndefined3,
+        .MessageLength = 0
     },
     { 
         .ShortName = "Strt",
-        .FullName = "Start"
+        .FullName = "Start",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeStart,
+        .MessageLength = 0
     },
     { 
         .ShortName = "Cont",
-        .FullName = "Continue"
+        .FullName = "Continue",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeContinue,
+        .MessageLength = 0
     },
     { 
         .ShortName = "Stop",
-        .FullName = "Stop"
+        .FullName = "Stop",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeStop,
+        .MessageLength = 0
     },
     { 
         .ShortName = "UDef",
-        .FullName = "Undefined"
+        .FullName = "Undefined",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeUndefined4,
+        .MessageLength = 0
     },
     { 
         .ShortName = "ASns",
-        .FullName = "Active Sensing"
+        .FullName = "Active Sensing",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeActiveSense,
+        .MessageLength = 0
     },
     { 
         .ShortName = "Rset",
-        .FullName = "System Reset"
+        .FullName = "System Reset",
+        .Class = ZwMidiMessageClassSysRealTime,
+        .Type = ZwMidiMessageTypeReset,
+        .MessageLength = 0
     },
 };
 
@@ -290,10 +354,13 @@ const char* MidiNoteFlats[MIDI_STRINGS_MAX_NOTES] = {
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/*  A brief description of a section can be given directly below the section
-    banner.
- */
-
+const struct ZwMidiMessageData* ZwMidiGetMessageData(uint8_t statusByte) {
+    if(MIDI_IS_STATUS_BYTE(statusByte) && MIDI_IS_CHANNEL(statusByte)) { 
+        return &MidiMessageDefinitionsChannel[(statusByte & MIDI_STATUS_TYPE_MASK) >> 4]; 
+    } else { 
+        return &MidiMessageDefinitionsSystem[(statusByte & MIDI_STATUS_TYPE_MASK)];
+    } 
+}
 // *****************************************************************************
 
 /** 

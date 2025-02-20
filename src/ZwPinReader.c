@@ -143,6 +143,15 @@ void lPinReaderPinChanged(GPIO_PIN pin, uintptr_t context) {
 
 // *****************************************************************************
 
+uint8_t ZwPinReaderGetNextUnread(uintptr_t reader) {
+    struct ZwPinReader *rdr = (struct ZwPinReader*) reader;
+    uint8_t value = rdr->Buffer[rdr->NextUnreadIndex++];
+    if(rdr->NextUnreadIndex >= configPINREADER_BUFFER_SIZE)
+        rdr->NextUnreadIndex = 0;
+    
+    return value;
+}
+
 static volatile uint32_t lPinsState;
 
 void ZwPinReaderOnInput(uint32_t status, uintptr_t context) {
@@ -177,7 +186,7 @@ void ZwPinReaderOnInput(uint32_t status, uintptr_t context) {
             __conditional_software_breakpoint(reader->NextBufferIndex < configPINREADER_BUFFER_SIZE);
             
             reader->Buffer[reader->NextBufferIndex++] = reader->ReadByte;
-
+            
             if(reader->NextBufferIndex == configPINREADER_BUFFER_SIZE)
                 reader->NextBufferIndex = 0;
             

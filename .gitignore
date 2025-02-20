@@ -64,4 +64,6 @@ out/
 .DS_Store
 .generated_files/
 
+queuelogs/
+
 **/dist/

@@ -96,6 +96,7 @@ struct ZwPinReader {
     uint8_t ReadBits;
     uint8_t ReadByte;
     uint16_t NextBufferIndex;
+    uint16_t NextUnreadIndex;
     uint8_t ConsecutiveIdleTicks;
     
     PINREAD_TIMER_START_FUNCTION TimerStart;
@@ -112,7 +113,7 @@ struct ZwPinReader {
  * @param PINREAD_lastByte integer Index to last written byte
  * @param PINREAD_preader Pointer to PinReader struct
  */
-#define PINREAD_LAST_WRITTEN(PINREAD_lastByte, PINREAD_preader) (PINREAD_lastByte = (PINREAD_preader->NextBufferIndex - 1) % configPINREADER_BUFFER_SIZE)
+#define PINREAD_LAST_WRITTEN(PINREAD_lastByte, PINREAD_preader) (PINREAD_lastByte = (PINREAD_preader->NextBufferIndex - 1) >= configPINREADER_BUFFER_SIZE ? configPINREADER_BUFFER_SIZE - 1 : PINREAD_preader->NextBufferIndex - 1)
 
 #define PINREAD_NEXT_BYTE(PINREAD_index) (PINREAD_index = (PINREAD_index + 1) % configPINREADER_BUFFER_SIZE)
 #define PINREAD_PREV_BYTE(PINREAD_index) (PINREAD_index = (PINREAD_index - 1) % configPINREADER_BUFFER_SIZE)
@@ -153,6 +154,8 @@ struct ZwPinReader {
      */
 
     // *****************************************************************************
+
+uint8_t ZwPinReaderGetNextUnread(uintptr_t reader);
 
     /**
       @Function

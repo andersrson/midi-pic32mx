@@ -189,6 +189,8 @@ static const DRV_USART_INTERRUPT_SOURCES drvUSART1InterruptSources =
     .intSources.multi.usartTxReadyInt      = -1,
     .intSources.multi.usartRxCompleteInt   = (int32_t)_UART2_RX_IRQ,
     .intSources.multi.usartErrorInt        = (int32_t)_UART2_ERR_IRQ,
+    /* DMA Rx interrupt line */
+    .intSources.multi.dmaRxChannelInt      = (int32_t)_DMA0_IRQ,
 };
 
 static const DRV_USART_INIT drvUsart1InitData =
@@ -200,6 +202,12 @@ static const DRV_USART_INIT drvUsart1InitData =
 
     /* USART Client Objects Pool */
     .clientObjPool = (uintptr_t)&drvUSART1ClientObjPool[0],
+
+    .dmaChannelTransmit = SYS_DMA_CHANNEL_NONE,
+
+    .dmaChannelReceive = DRV_USART_RCV_DMA_CH_IDX1,
+
+    .usartReceiveAddress = (void *)&(U2RXREG),
 
     /* Combined size of transmit and receive buffer objects */
     .bufferObjPoolSize = DRV_USART_QUEUE_SIZE_IDX1,
@@ -257,6 +265,8 @@ static const DRV_USART_INTERRUPT_SOURCES drvUSART0InterruptSources =
     .intSources.multi.usartTxReadyInt      = -1,
     .intSources.multi.usartRxCompleteInt   = (int32_t)_UART1_RX_IRQ,
     .intSources.multi.usartErrorInt        = (int32_t)_UART1_ERR_IRQ,
+    /* DMA Rx interrupt line */
+    .intSources.multi.dmaRxChannelInt      = (int32_t)_DMA1_IRQ,
 };
 
 static const DRV_USART_INIT drvUsart0InitData =
@@ -268,6 +278,12 @@ static const DRV_USART_INIT drvUsart0InitData =
 
     /* USART Client Objects Pool */
     .clientObjPool = (uintptr_t)&drvUSART0ClientObjPool[0],
+
+    .dmaChannelTransmit = SYS_DMA_CHANNEL_NONE,
+
+    .dmaChannelReceive = DRV_USART_RCV_DMA_CH_IDX0,
+
+    .usartReceiveAddress = (void *)&(U1RXREG),
 
     /* Combined size of transmit and receive buffer objects */
     .bufferObjPoolSize = DRV_USART_QUEUE_SIZE_IDX0,
@@ -356,10 +372,11 @@ void SYS_Initialize ( void* data )
 
 	GPIO_Initialize();
 
+    DMAC_Initialize();
     I2C1_Initialize();
-    TMR4_Initialize();
-
 	UART1_Initialize();
+
+    TMR4_Initialize();
 
     TMR5_Initialize();
 

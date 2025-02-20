@@ -300,4 +300,66 @@ _UART_2_Handler:
     nop
     portRESTORE_CONTEXT
     .end    _UART_2_Handler
+   .extern  DMA_0_Handler
+
+   .section .vector_40,code, keep
+   .equ     __vector_dispatch_40, IntVectorDMA_0_Handler
+   .global  __vector_dispatch_40
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorDMA_0_Handler
+
+IntVectorDMA_0_Handler:
+    la    $26,  _DMA_0_Handler
+    jr    $26
+    nop
+    .end    IntVectorDMA_0_Handler
+
+   .section .DMA_0_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _DMA_0_Handler
+
+_DMA_0_Handler:
+    portSAVE_CONTEXT
+    la    s6,  DMA_0_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _DMA_0_Handler
+   .extern  DMA_1_Handler
+
+   .section .vector_41,code, keep
+   .equ     __vector_dispatch_41, IntVectorDMA_1_Handler
+   .global  __vector_dispatch_41
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorDMA_1_Handler
+
+IntVectorDMA_1_Handler:
+    la    $26,  _DMA_1_Handler
+    jr    $26
+    nop
+    .end    IntVectorDMA_1_Handler
+
+   .section .DMA_1_Handler_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _DMA_1_Handler
+
+_DMA_1_Handler:
+    portSAVE_CONTEXT
+    la    s6,  DMA_1_Handler
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end    _DMA_1_Handler
 
